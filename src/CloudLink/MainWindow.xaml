@@ -1,0 +1,294 @@
+<Window x:Class="CloudLink.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="CloudLink" Width="980" Height="800" MinWidth="760" MinHeight="600"
+        WindowStartupLocation="CenterScreen" Icon="/Assets/CloudLink.ico"
+        AllowDrop="True" DragOver="Window_DragOver" Drop="Window_Drop">
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo x:Name="Taskbar" />
+    </Window.TaskbarItemInfo>
+    <Window.InputBindings>
+        <KeyBinding Key="F1" Command="ApplicationCommands.Help" />
+        <KeyBinding Key="Esc" Command="ApplicationCommands.Stop" />
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Help" Executed="Help_Executed" />
+        <CommandBinding Command="ApplicationCommands.Stop" Executed="Stop_Executed" />
+    </Window.CommandBindings>
+
+    <Grid TextElement.Foreground="{DynamicResource TextBrush}">
+
+        <!-- Soft brand light behind the header. It only moves while a download is running. -->
+        <Canvas IsHitTestVisible="False" ClipToBounds="True" Opacity="{DynamicResource AuroraOpacity}">
+            <Ellipse Width="640" Height="640" Canvas.Left="-200" Canvas.Top="-330">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Offset="0" Color="#B32E7BFF" />
+                        <GradientStop Offset="1" Color="#002E7BFF" />
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+                <Ellipse.RenderTransform>
+                    <TranslateTransform x:Name="AuroraA" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse Width="600" Height="600" Canvas.Right="-180" Canvas.Top="-300">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Offset="0" Color="#B37B4DFF" />
+                        <GradientStop Offset="1" Color="#007B4DFF" />
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
+                <Ellipse.RenderTransform>
+                    <TranslateTransform x:Name="AuroraB" />
+                </Ellipse.RenderTransform>
+            </Ellipse>
+        </Canvas>
+
+        <Grid x:Name="Body" Margin="24,18,24,24">
+            <Grid.RenderTransform>
+                <TranslateTransform x:Name="BodyShift" />
+            </Grid.RenderTransform>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- 1. Identity on the left, accounts and help on the right -->
+            <DockPanel Grid.Row="0" Margin="0,0,0,18">
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="MicrosoftButton" Style="{StaticResource GhostButton}" Click="Microsoft_Click" Margin="0,0,8,0" TabIndex="20">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse x:Name="MicrosoftDot" Width="8" Height="8" Margin="0,1,8,0" VerticalAlignment="Center" Fill="{DynamicResource IdleBrush}" />
+                            <TextBlock x:Name="MicrosoftText" Text="Microsoft: sign in" MaxWidth="220" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="GoogleButton" Style="{StaticResource GhostButton}" Click="Google_Click" Margin="0,0,8,0" TabIndex="21">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse x:Name="GoogleDot" Width="8" Height="8" Margin="0,1,8,0" VerticalAlignment="Center" Fill="{DynamicResource IdleBrush}" />
+                            <TextBlock x:Name="GoogleText" Text="Google: sign in" MaxWidth="220" TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="HelpButton" Style="{StaticResource IconButton}" Command="ApplicationCommands.Help" Margin="0,0,8,0"
+                            Content="&#xE897;" ToolTip="Help (F1)" AutomationProperties.Name="Help" TabIndex="22" />
+                    <Button x:Name="SettingsButton" Style="{StaticResource IconButton}" Click="Settings_Click"
+                            Content="&#xE713;" ToolTip="Settings" AutomationProperties.Name="Settings" TabIndex="23" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="{StaticResource LogoImage}" Width="40" Height="40" Margin="0,0,12,0" />
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="CloudLink" FontSize="21" FontWeight="SemiBold" />
+                        <TextBlock x:Name="VersionText" FontSize="11.5" Opacity="0.7" Text="Version" />
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- 2. What to download, where to, and the one main action -->
+            <Border Grid.Row="1" Style="{StaticResource Card}" Margin="0,0,0,14">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.ColumnSpan="2" Style="{StaticResource Caption}" Text="SHARED LINK" Margin="2,0,0,6" />
+                    <TextBox x:Name="LinksBox" Grid.Row="1" AcceptsReturn="True" TextWrapping="NoWrap" Height="62"
+                             VerticalScrollBarVisibility="Auto" TextChanged="LinksBox_TextChanged" TabIndex="1"
+                             AutomationProperties.Name="Shared links, one per line" />
+                    <TextBlock x:Name="LinksHint" Grid.Row="1" IsHitTestVisible="False" Opacity="0.65" Margin="11,5,0,0"
+                               Text="Paste a OneDrive or Google Drive link. More than one? Put each on its own line." />
+                    <Button x:Name="PasteButton" Grid.Row="1" Grid.Column="1" Style="{StaticResource GhostButton}" Click="Paste_Click"
+                            Margin="10,0,0,0" MinWidth="104" VerticalAlignment="Top" ToolTip="Add the link from the clipboard"
+                            TabIndex="2" AutomationProperties.Name="Paste link from clipboard">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE77F;" Margin="0,2,8,0" />
+                            <TextBlock Text="Paste" />
+                        </StackPanel>
+                    </Button>
+
+                    <Grid Grid.Row="2" Grid.ColumnSpan="2" Margin="0,14,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Style="{StaticResource Caption}" Text="SAVE TO" Margin="2,0,0,6" />
+                        <TextBox x:Name="DestinationBox" Grid.Row="1" VerticalAlignment="Center" AutomationProperties.Name="Destination folder" TabIndex="3" />
+                        <Button x:Name="BrowseButton" Grid.Row="1" Grid.Column="1" Style="{StaticResource GhostButton}" Click="Browse_Click"
+                                Margin="10,0,0,0" MinWidth="104" ToolTip="Choose the folder the files go into"
+                                TabIndex="4" AutomationProperties.Name="Browse for destination folder">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE8B7;" Margin="0,2,8,0" />
+                                <TextBlock Text="Browse" />
+                            </StackPanel>
+                        </Button>
+                        <Grid Grid.Row="1" Grid.Column="2" Margin="18,0,0,0" MinWidth="168">
+                            <Button x:Name="StartButton" Style="{StaticResource PrimaryButton}" Click="Start_Click" IsDefault="True" TabIndex="5"
+                                    AutomationProperties.Name="{Binding Text, ElementName=StartText}">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE896;" Margin="0,3,10,0" />
+                                    <TextBlock x:Name="StartText" Text="Download" />
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="CancelButton" Style="{StaticResource GhostButton}" Click="Cancel_Click" Height="44"
+                                    Visibility="Collapsed" ToolTip="Stop now (Esc). What is finished is kept and the rest can be continued later."
+                                    TabIndex="5" AutomationProperties.Name="Stop">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE71A;" Margin="0,2,10,0" />
+                                    <TextBlock Text="Stop" FontSize="15" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </Button>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- 3. What is happening right now -->
+            <Border Grid.Row="2" Style="{StaticResource Card}" Margin="0,0,0,14">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid x:Name="Badge" Width="68" Height="68" Margin="0,0,18,0" RenderTransformOrigin="0.5,0.5">
+                        <Grid.RenderTransform>
+                            <ScaleTransform x:Name="BadgeScale" />
+                        </Grid.RenderTransform>
+                        <Ellipse x:Name="BadgeFill" Fill="{DynamicResource TrackBrush}" />
+                        <TextBlock x:Name="BadgeGlyph" FontFamily="{StaticResource IconFont}" FontSize="26" Text="&#xE896;"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <TextBlock x:Name="PercentText" FontSize="20" FontWeight="SemiBold" Visibility="Collapsed"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" Text="0%" />
+                        <Path x:Name="CheckMark" Data="M20,35 L30,45 L49,24" Stroke="White" StrokeThickness="5" Visibility="Collapsed"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"
+                              StrokeDashArray="10 10" StrokeDashOffset="0" />
+                    </Grid>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock x:Name="StatusText" FontSize="16" FontWeight="SemiBold" TextWrapping="Wrap"
+                                   Text="Ready when you are" AutomationProperties.LiveSetting="Polite" />
+                        <TextBlock x:Name="DetailText" Margin="0,3,0,0" Opacity="0.78" TextWrapping="Wrap"
+                                   Text="Paste a shared link above and press Download." />
+                        <ProgressBar x:Name="OverallBar" Style="{StaticResource BrandProgress}" Margin="0,12,0,0"
+                                     AutomationProperties.Name="Overall progress" />
+                        <StackPanel x:Name="StatsPanel" Orientation="Horizontal" Margin="0,10,0,0" Visibility="Collapsed">
+                            <Ellipse Width="8" Height="8" Fill="{DynamicResource OkBrush}" VerticalAlignment="Center" Margin="0,1,6,0" />
+                            <TextBlock x:Name="StatDone" Text="0 done" Margin="0,0,18,0" />
+                            <Ellipse Width="8" Height="8" Fill="{DynamicResource ActiveBrush}" VerticalAlignment="Center" Margin="0,1,6,0" />
+                            <TextBlock x:Name="StatLeft" Text="0 to go" Margin="0,0,18,0" />
+                            <Ellipse Width="8" Height="8" Fill="{DynamicResource ErrorBrush}" VerticalAlignment="Center" Margin="0,1,6,0" />
+                            <TextBlock x:Name="StatProblems" Text="0 problems" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <Button x:Name="OpenFolderButton" Grid.Column="2" Style="{StaticResource GhostButton}" Click="OpenFolder_Click"
+                            Margin="18,0,0,0" VerticalAlignment="Center" ToolTip="Show the destination folder in File Explorer"
+                            TabIndex="6" AutomationProperties.Name="Open destination folder">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontFamily="{StaticResource IconFont}" Text="&#xE838;" Margin="0,2,8,0" />
+                            <TextBlock Text="Open folder" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- 4. Every file, with a way to see only what needs attention -->
+            <Border Grid.Row="3" Style="{StaticResource Card}" Padding="8,12,8,8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <DockPanel Margin="12,0,8,8">
+                        <Border DockPanel.Dock="Right" CornerRadius="10" Padding="3" Background="{DynamicResource TrackBrush}">
+                            <StackPanel Orientation="Horizontal">
+                                <RadioButton x:Name="FilterAll" Style="{StaticResource Segment}" GroupName="Filter" IsChecked="True" Click="Filter_Click" Content="All" TabIndex="7" />
+                                <RadioButton x:Name="FilterActive" Style="{StaticResource Segment}" GroupName="Filter" Click="Filter_Click" Content="In progress" TabIndex="8" />
+                                <RadioButton x:Name="FilterProblems" Style="{StaticResource Segment}" GroupName="Filter" Click="Filter_Click" Content="Problems" TabIndex="9" />
+                            </StackPanel>
+                        </Border>
+                        <TextBlock x:Name="CountText" Style="{StaticResource Caption}" Text="FILES" VerticalAlignment="Center" />
+                    </DockPanel>
+
+                    <ListView x:Name="FilesList" Grid.Row="1" Background="Transparent" BorderThickness="0"
+                              VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.VirtualizationMode="Recycling"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled" SizeChanged="FilesList_SizeChanged"
+                              AutomationProperties.Name="Files" TabIndex="10">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn x:Name="FileColumn" Header="File" Width="430">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock TextTrimming="CharacterEllipsis" ToolTip="{Binding DisplayPath, Mode=OneTime}">
+                                                <Run Text="{Binding FileName, Mode=OneTime}" /><Run Text="{Binding FolderText, Mode=OneTime}"
+                                                     Foreground="{DynamicResource IdleBrush}" />
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Size" Width="90" DisplayMemberBinding="{Binding SizeText, Mode=OneWay}" />
+                                <GridViewColumn Header="Progress" Width="110">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <ProgressBar Style="{StaticResource RowProgress}" Width="88" Value="{Binding Percent, Mode=OneWay}" />
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Status" Width="280">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" ToolTip="{Binding StatusText, Mode=OneWay}">
+                                                <Ellipse Width="8" Height="8" Margin="0,1,8,0" VerticalAlignment="Center">
+                                                    <Ellipse.Style>
+                                                        <Style TargetType="Ellipse">
+                                                            <Setter Property="Fill" Value="{DynamicResource IdleBrush}" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Kind, Mode=OneWay}" Value="ok">
+                                                                    <Setter Property="Fill" Value="{DynamicResource OkBrush}" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Kind, Mode=OneWay}" Value="active">
+                                                                    <Setter Property="Fill" Value="{DynamicResource ActiveBrush}" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Kind, Mode=OneWay}" Value="warn">
+                                                                    <Setter Property="Fill" Value="{DynamicResource WarnBrush}" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding Kind, Mode=OneWay}" Value="error">
+                                                                    <Setter Property="Fill" Value="{DynamicResource ErrorBrush}" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Ellipse.Style>
+                                                </Ellipse>
+                                                <TextBlock Text="{Binding StatusText, Mode=OneWay}" TextTrimming="CharacterEllipsis" MaxWidth="240" />
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+
+                    <!-- Shown until a link has been looked through -->
+                    <StackPanel x:Name="EmptyState" Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False">
+                        <Image Source="{StaticResource LogoImage}" Width="56" Height="56" Opacity="0.85" />
+                        <TextBlock Text="Nothing here yet" FontSize="16" FontWeight="SemiBold" HorizontalAlignment="Center" Margin="0,12,0,4" />
+                        <TextBlock Opacity="0.75" TextAlignment="Center" LineHeight="20"
+                                   Text="Paste a share link above, or drop one anywhere on this window.&#10;The files in it will be listed here." />
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

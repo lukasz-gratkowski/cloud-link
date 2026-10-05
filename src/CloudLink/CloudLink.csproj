@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>CloudLink</RootNamespace>
+    <AssemblyName>CloudLink</AssemblyName>
+    <ApplicationIcon>Assets\CloudLink.ico</ApplicationIcon>
+    <Company>AMG Cloud Engineering</Company>
+    <Authors>AMG Cloud Engineering</Authors>
+    <Description>Downloads shared OneDrive and Google Drive folders and files</Description>
+    <Copyright>Copyright (c) 2026 AMG Cloud Engineering</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Product>CloudLink</Product>
+    <NoWarn>$(NoWarn);WPF0001</NoWarn>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\CloudLink.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Read back by Settings.BuiltInMicrosoftClientId. -->
+    <AssemblyMetadata Include="MicrosoftClientId" Value="$(CloudLinkMicrosoftClientId)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="CloudLink.Tests" />
+  </ItemGroup>
+
+</Project>

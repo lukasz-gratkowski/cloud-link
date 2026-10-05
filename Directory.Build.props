@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <!-- The one place the version lives. Bump it here and add a CHANGELOG.md entry. -->
+    <Version>1.2.0</Version>
+
+    <!--
+      The application (client) ID of CloudLink's Microsoft Entra app registration, which every copy of
+      this build signs in to OneDrive through. It identifies the app; it is not a secret.
+      A fork should put its own registration's ID here. See docs/APP-REGISTRATION.md.
+      For one build it can be replaced with  .\build.ps1 -MicrosoftClientId <guid>  and with the value
+      "none" the build has no ID at all, so OneDrive asks each user for one in Settings.
+    -->
+    <CloudLinkMicrosoftClientId Condition="'$(CloudLinkMicrosoftClientId)' == ''">21041c7e-49f3-4ccd-9961-9d0e05cd888d</CloudLinkMicrosoftClientId>
+  </PropertyGroup>
+</Project>
