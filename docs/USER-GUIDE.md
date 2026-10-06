@@ -90,7 +90,8 @@ of about five minutes at <https://console.cloud.google.com>:
    - **APIs & Services → OAuth consent screen**: choose *External*, fill in the app name and your address,
      and add your own Google address under **Test users**.
    - **Credentials → Create credentials → OAuth client ID**, type **Desktop app**.
-   - Copy the client ID and client secret into **Settings**, then click **Google: set up** in the main window
+   - Copy the client ID and client secret into **Settings**, then click the Google button at the top right of
+     the main window (it reads **Google: set up**, or **Google: public links only** when an API key is saved)
      to sign in.
 
 While the consent screen is in *Testing*, Google ends the sign-in after seven days and CloudLink asks you to
@@ -103,6 +104,7 @@ sign in again. Publishing the consent screen removes that limit.
 | *Not found, or the link no longer works* | The link is incomplete, was withdrawn, or the signed-in account may not open it. Open it in a browser with the same account to check. |
 | *Access denied* | Sign in with the account the item was shared with. |
 | *Your organisation requires an administrator to approve CloudLink* / **Need admin approval** in the browser | Your work or school does not let you approve apps yourself. Close the page, press **Stop** in CloudLink if it is still waiting, and see [Work and school accounts](APP-REGISTRATION.md#work-and-school-accounts). |
+| Microsoft's page shows an error instead of a sign-in form | The fault is in the app registration CloudLink signs in through, not in your account. Press **Stop**, and please [report it](https://github.com/lukasz-gratkowski/cloud-link/issues). Until it is fixed you can enter an application ID of your own in Settings; see [APP-REGISTRATION.md](APP-REGISTRATION.md#creating-a-registration). |
 | *The Microsoft sign-in was not finished in time* | The browser page was closed or left open without finishing. Press **Download** to try again. If the page said **Need admin approval**, see the row above. |
 | *The sign-in was cancelled, or the permission was not granted* | Press **Download** to try again and accept the permission page; CloudLink cannot work without it. |
 | *The service asked to slow down* | Nothing; CloudLink waits and continues. If it happens a lot, lower **Files downloaded at the same time** in Settings. |

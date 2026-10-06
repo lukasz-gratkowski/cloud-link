@@ -13,16 +13,21 @@ Get-FileHash .\CloudLink.exe -Algorithm SHA256
 **Signature.** Right-click the file → **Properties** → **Digital Signatures**, or:
 
 ```powershell
-Get-AuthenticodeSignature .\CloudLink.exe | Format-List SignerCertificate, Status, TimeStamperCertificate
+Get-AuthenticodeSignature .\CloudLink.exe | Format-List Status, StatusMessage, SignerCertificate, TimeStamperCertificate
 ```
 
-A signature guarantees the file has not been altered since it was signed. What Windows says about the
-*publisher* depends on the kind of certificate:
+`Status` tells you whether the file is intact: `Valid`, or for a self-signed certificate `UnknownError` with a
+message about an untrusted root, both mean it has not been altered since it was signed. `HashMismatch` means
+it has. What Windows says about the *publisher* depends on the kind of certificate:
 
 | Certificate | Signature | Windows on first run |
 |---|---|---|
 | Issued by a public certificate authority | `Valid` | Shows the publisher's name. SmartScreen may still warn until the file or certificate has built reputation. |
 | Self-signed | `UnknownError` (untrusted root) | *Unknown publisher*, and the SmartScreen "Windows protected your PC" prompt: **More info → Run anyway**. |
+
+Two more things can get in the way of a self-signed build: the browser may ask you to confirm keeping the
+download, and Smart App Control, if it is switched on in Windows 11, may block the program without offering
+**Run anyway**.
 
 A self-signed build is tamper-evident but its publisher is not vouched for by anyone. If you trust the person
 you got it from, you can make Windows trust their certificate on your own PC by importing the

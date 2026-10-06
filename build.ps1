@@ -125,7 +125,8 @@ if ($cert) {
 
 # Checksums let anyone confirm that a download is the file that was built here.
 $hash = (Get-FileHash $exe -Algorithm SHA256).Hash.ToLowerInvariant()
-Set-Content publish\SHA256SUMS.txt "$hash  CloudLink.exe"
+# Written with a Unix line ending: older versions of sha256sum reject a file that ends in CR LF.
+[IO.File]::WriteAllText((Join-Path $PSScriptRoot 'publish\SHA256SUMS.txt'), "$hash  CloudLink.exe`n")
 
 $sig = Get-AuthenticodeSignature $exe
 [pscustomobject]@{

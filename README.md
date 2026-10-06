@@ -33,8 +33,8 @@ files themselves, one by one, resumes whatever was interrupted, and verifies eac
 
 ## Getting started
 
-1. Get `CloudLink.exe`: [build it](#building), or take it from the [Releases](../../releases) page if a release
-   has been published. It is a single file; nothing needs installing. See
+1. Download `CloudLink.exe` from the [latest release](../../releases/latest), or [build it](#building). It is a
+   single file; nothing needs installing. See
    [Verifying a download](docs/SIGNING.md) for the signature and checksum.
 2. Run it and paste a share link.
 3. Choose the folder to save to and press **Download**.
@@ -107,6 +107,7 @@ stalls, throttles and corrupts data.
 - Work and school Microsoft accounts usually need an administrator to approve CloudLink once for the
   organisation; that is Microsoft's default for apps from a publisher it has not verified
   ([details](docs/APP-REGISTRATION.md#work-and-school-accounts)). Personal accounts do not.
-- OneDrive downloads have been exercised with a personal Microsoft account. Work and school accounts, and
-  opening a link with the other kind of account (a personal account on a `sharepoint.com` link or the
-  reverse), have not been tested.
+- What has been tested: OneDrive sign-in and download with a personal Microsoft account. Not tested: work and
+  school accounts, and opening a link with the other kind of account (a personal account on a `sharepoint.com`
+  link or the reverse). Google Drive is covered by automated tests against a local stand-in server and has
+  not yet been run against the real service.

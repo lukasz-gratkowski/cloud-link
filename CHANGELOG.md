@@ -3,6 +3,17 @@
 All notable changes are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com),
 and versions follow [Semantic Versioning](https://semver.org).
 
+## [Unreleased]
+
+### Fixed
+- `build.ps1` writes `SHA256SUMS.txt` with a Unix line ending, so `sha256sum -c` accepts it. (The file
+  attached to the 1.2.0 release was corrected by hand.)
+
+### Changed
+- Documentation: the README points to the latest release and says what has and has not been tested; the
+  signing guide explains the `Status` values and mentions Smart App Control; the user guide covers an error
+  on Microsoft's sign-in page and the wording of the Google button.
+
 ## [1.2.0] - 2026-10-05
 
 ### Changed
