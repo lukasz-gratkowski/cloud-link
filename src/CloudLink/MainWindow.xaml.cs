@@ -400,6 +400,7 @@ public partial class MainWindow : Window
         PreventSleep(true);
 
         string step = "Sign-in did not work";
+        object? opening = null;   // the service whose link is being looked through
         try
         {
             foreach (var provider in links.Select(l => l.Provider).Distinct())
@@ -419,6 +420,7 @@ public partial class MainWindow : Window
             var roots = new HashSet<string>();
             foreach (var (link, provider) in links)
             {
+                opening = provider;
                 await Task.Run(() => _engine.ScanAsync(provider, link, destination, item =>
                 {
                     lock (found) found.Add(item);
@@ -468,8 +470,14 @@ public partial class MainWindow : Window
         {
             Log.Write("Run failed: " + ex);
             _downloading = false;
-            Say(Stage.Error, step, Errors.Describe(ex).TrimEnd('.') + "." + (ex is CloudException { StatusCode: 403 or 404 }
-                ? " Check that the link is complete and that the signed-in account is allowed to open it." : ""));
+            // "Not found" from Google Drive without a sign-in is what a private link looks like to an API key.
+            bool privateForKey = ex is CloudException { StatusCode: 404 }
+                && ReferenceEquals(opening, _services.GoogleDrive) && !_services.GoogleAuth.IsSignedIn;
+            string hint = ex is not CloudException { StatusCode: 403 or 404 } ? ""
+                : privateForKey
+                    ? " An API key opens only links that anyone with the link can open. For a private link, click the Google button and sign in first."
+                    : " Check that the link is complete and that the signed-in account is allowed to open it.";
+            Say(Stage.Error, step, Errors.Describe(ex).TrimEnd('.') + "." + hint);
         }
         finally
         {
@@ -820,7 +828,8 @@ public partial class MainWindow : Window
     }
 
     // Development aid: "CloudLink.exe --demo" shows the window with sample rows; tools\screenshots.ps1 uses it.
-    // Further flags: --done, --empty, --help, --settings, --light, --dark, --software.
+    // Further flags: --done, --empty (with --link to keep the link), --google, --google-private (with
+    // --signed-in or --waiting), --help, --settings, --light, --dark, --software.
     void ShowDemo()
     {
         var sample = new RemoteEntry { Id = "x", Name = "x" };
@@ -838,6 +847,9 @@ public partial class MainWindow : Window
         MicrosoftDot.SetResourceReference(Shape.FillProperty, "OkBrush");
         GoogleText.Text = "Google: set up";
         GoogleDot.SetResourceReference(Shape.FillProperty, "IdleBrush");
+        // Fixed names for the screenshot tool, whatever this PC's real sign-in state is.
+        System.Windows.Automation.AutomationProperties.SetName(MicrosoftButton, "Microsoft account");
+        System.Windows.Automation.AutomationProperties.SetName(GoogleButton, "Google account");
         _items =
         [
             Row(@"Holiday\2024\IMG_0001.jpg", 4_200_000, 4_200_000, FileState.Done),
@@ -859,6 +871,55 @@ public partial class MainWindow : Window
         SetProgress(36, animate: false);
 
         string[] args = Environment.GetCommandLineArgs();
+        bool google = args.Contains("--google");
+        if (google)
+        {
+            // The Google Drive walkthrough: a public folder fetched with an API key.
+            FileItem File(string path, long size) => Row(path, size, size, FileState.Done);
+            LinksBox.Text = "https://drive.google.com/drive/folders/1AbCdEfGhIjKlMnOpQrStUvWxYz012345";
+            MicrosoftText.Text = "Microsoft: sign in";
+            MicrosoftDot.SetResourceReference(Shape.FillProperty, "IdleBrush");
+            GoogleText.Text = "Google: public links only";
+            GoogleDot.SetResourceReference(Shape.FillProperty, "WarnBrush");
+            _items =
+            [
+                File(@"Trip\Day 1\IMG_2041.jpg", 5_100_000),
+                File(@"Trip\Day 1\IMG_2042.jpg", 4_700_000),
+                File(@"Trip\Day 2\Clip.mp4", 212_000_000),
+                File(@"Trip\Itinerary.docx", 31_000),
+            ];
+            FilesList.ItemsSource = _items;
+            CountText.Text = "4 FILES";
+            StatDone.Text = "4 done"; StatLeft.Text = "0 to go"; StatProblems.Text = "0 problems";
+            SetProgress(100, animate: false);
+            Say(Stage.Success, "Done. All 4 files are ready",
+                "212 MB in place. Every file was checked against the size and checksum the service reports.");
+        }
+        bool privateLink = args.Contains("--google-private");
+        if (privateLink)
+        {
+            // The Google sign-in walkthrough: a private folder, opened after signing in.
+            FileItem File(string path, long size) => Row(path, size, size, FileState.Done);
+            LinksBox.Text = "https://drive.google.com/drive/folders/1ZyXwVuTsRqPoNmLkJiHgFeDcBa987654";
+            MicrosoftText.Text = "Microsoft: sign in";
+            MicrosoftDot.SetResourceReference(Shape.FillProperty, "IdleBrush");
+            bool signedIn = args.Contains("--signed-in");
+            GoogleText.Text = signedIn ? "you@gmail.com" : "Google: set up";
+            GoogleDot.SetResourceReference(Shape.FillProperty, signedIn ? "OkBrush" : "IdleBrush");
+            _items =
+            [
+                File(@"Project files\Contract.pdf", 1_400_000),
+                File(@"Project files\Drawings\Floor plan.dwg", 8_300_000),
+                File(@"Project files\Drawings\Site photo.jpg", 3_600_000),
+                File(@"Project files\Meeting notes.docx", 42_000),
+            ];
+            FilesList.ItemsSource = _items;
+            CountText.Text = "4 FILES";
+            StatDone.Text = "4 done"; StatLeft.Text = "0 to go"; StatProblems.Text = "0 problems";
+            SetProgress(100, animate: false);
+            Say(Stage.Success, "Done. All 4 files are ready",
+                "12.7 MB in place. Every file was checked against the size and checksum the service reports.");
+        }
         if (args.Contains("--done"))
         {
             foreach (var item in _items) { item.Received = item.Size ?? 0; item.Set(FileState.Done); }
@@ -868,7 +929,8 @@ public partial class MainWindow : Window
         }
         if (args.Contains("--empty"))
         {
-            LinksBox.Text = "";
+            // The link stays only for the picture of the step that pastes it.
+            if (!args.Contains("--link")) LinksBox.Text = "";
             FilesList.ItemsSource = null;
             EmptyState.Visibility = Visibility.Visible;
             StatsPanel.Visibility = Visibility.Collapsed;
@@ -877,6 +939,30 @@ public partial class MainWindow : Window
             Say(Stage.Idle, "Ready when you are", "Paste a shared link above and press Download.");
         }
         if (args.Contains("--help")) new HelpWindow { Owner = this }.Show();
-        if (args.Contains("--settings")) new SettingsWindow(new Settings(), null) { Owner = this }.Show();
+        bool waiting = args.Contains("--waiting");
+        if (waiting) Say(Stage.Looking, "Waiting for the Google sign-in", "Finish signing in in your browser, then come back here. Stop cancels.");
+        // A run in progress looks the way the real window does: Stop in place of Download, the rest locked.
+        bool running = !google && !privateLink && !args.Contains("--done") && !args.Contains("--empty");
+        if (waiting || running)
+        {
+            StartButton.Visibility = Visibility.Collapsed;
+            CancelButton.Visibility = Visibility.Visible;
+            LinksBox.IsReadOnly = DestinationBox.IsReadOnly = true;
+            PasteButton.IsEnabled = BrowseButton.IsEnabled = SettingsButton.IsEnabled = false;
+            MicrosoftButton.IsEnabled = GoogleButton.IsEnabled = false;
+        }
+        if (args.Contains("--settings"))
+        {
+            // Made-up values of the right shape; the boxes for the key and the secret show dots anyway.
+            var shown = new Settings
+            {
+                GoogleApiKey = google ? "placeholder-not-a-real-key-000000000" : "",
+                GoogleClientId = privateLink ? "123456789012-abcdefghijklmnopqrstuvwxyz012345.apps.googleusercontent.com" : "",
+                GoogleClientSecret = privateLink ? "placeholder-not-a-real-secret-0000" : "",
+            };
+            // Opened from the Google button with no client saved, Settings explains why it opened.
+            string? notice = privateLink ? "Google sign-in needs a client ID and secret first. The steps are below." : null;
+            new SettingsWindow(shown, notice) { Owner = this }.Show();
+        }
     }
 }

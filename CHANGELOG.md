@@ -13,6 +13,17 @@ and versions follow [Semantic Versioning](https://semver.org).
 - Documentation: the README points to the latest release and says what has and has not been tested; the
   signing guide explains the `Status` values and mentions Smart App Control; the user guide covers an error
   on Microsoft's sign-in page and the wording of the Google button.
+- The user guide has the Google Drive setup step by step, with pictures, for both routes: an API key
+  restricted to the Google Drive API (public links) and sign-in through your own "Desktop app" client
+  (private links). It follows Google's current console (Google Auth platform) and is also published at
+  <https://amgcloud.io/apps/cloudlink/guide/>.
+- When a Google Drive link is not found while only an API key is in use, CloudLink says that the link may be
+  private and that signing in with the Google button is needed.
+- `tools/screenshots.ps1` can mark and number controls in a picture and waits until the window has been
+  drawn; the demo mode has Google Drive scenarios for the guide's pictures. The pictures of a running
+  download now show **Stop** in place of **Download**, as the window does.
+- The user guide has a section on checking the downloaded exe, and its troubleshooting table covers the
+  Google sign-in, Google's rate limit and Smart App Control.
 
 ## [1.2.0] - 2026-10-05
 

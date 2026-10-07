@@ -40,8 +40,9 @@ files themselves, one by one, resumes whatever was interrupted, and verifies eac
 3. Choose the folder to save to and press **Download**.
 
 The first OneDrive download opens your browser for a Microsoft sign-in with the account you already have;
-there is nothing to set up in Azure. Google Drive needs a short one-time setup. Both are described in the
-[user guide](docs/USER-GUIDE.md).
+there is nothing to set up in Azure. Google Drive needs a one-time setup, which the
+[user guide](docs/USER-GUIDE.md#google-drive) walks through step by step, with pictures. The same guide is
+published at <https://amgcloud.io/apps/cloudlink/guide/>.
 
 <p align="center">
   <img src="docs/images/done-dark.png" width="48%" alt="A finished download">
@@ -69,7 +70,8 @@ More detail is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ## Documentation
 
-- [User guide](docs/USER-GUIDE.md): accounts, Google setup, troubleshooting
+- [User guide](docs/USER-GUIDE.md): downloading, accounts, the Google Drive setup step by step, troubleshooting
+  (also at <https://amgcloud.io/apps/cloudlink/guide/>)
 - [Verifying and signing](docs/SIGNING.md): the signature, checksums, and signing your own build
 - [Microsoft app registration](docs/APP-REGISTRATION.md): what users need (nothing), and what a fork needs
 - [Architecture](docs/ARCHITECTURE.md): how the code is organised and why
@@ -107,7 +109,8 @@ stalls, throttles and corrupts data.
 - Work and school Microsoft accounts usually need an administrator to approve CloudLink once for the
   organisation; that is Microsoft's default for apps from a publisher it has not verified
   ([details](docs/APP-REGISTRATION.md#work-and-school-accounts)). Personal accounts do not.
-- What has been tested: OneDrive sign-in and download with a personal Microsoft account. Not tested: work and
-  school accounts, and opening a link with the other kind of account (a personal account on a `sharepoint.com`
-  link or the reverse). Google Drive is covered by automated tests against a local stand-in server and has
-  not yet been run against the real service.
+- What has been tested: OneDrive sign-in and download with a personal Microsoft account, and Google Drive
+  links that anyone can open, with an API key. Not tested: work and school Microsoft accounts; opening a link
+  with the other kind of Microsoft account (a personal account on a `sharepoint.com` link or the reverse);
+  and Google sign-in for private links, which so far is covered only by automated tests against a local
+  stand-in server.

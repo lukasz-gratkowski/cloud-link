@@ -15,7 +15,10 @@ public static class Theme
     public static bool IsDark => Equals(Registry.GetValue(PersonalizeKey, "AppsUseLightTheme", 1), 0);
 
     /// <summary>False when the user has turned animations off in Windows, or over a remote session.</summary>
-    public static bool Motion => SystemParameters.ClientAreaAnimation && !SystemParameters.IsRemoteSession;
+    public static bool Motion => !Still && SystemParameters.ClientAreaAnimation && !SystemParameters.IsRemoteSession;
+
+    /// <summary>Set for documentation pictures (--demo): nothing fades in or moves, so a capture shows the final state.</summary>
+    public static bool Still { get; set; }
 
     /// <summary>Set by the --light and --dark development flags; otherwise Windows decides.</summary>
     public static bool? Forced { get; set; }

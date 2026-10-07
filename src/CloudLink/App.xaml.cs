@@ -25,6 +25,7 @@ public partial class App : Application
         var wake = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\CloudLink.Wake");
         bool demo = e.Args.Contains("--demo");
         AppInfo.ShowCommit = !demo;   // documentation pictures should not carry a commit
+        Theme.Still = demo;           // nor be caught half-way through an animation
         if (!first && !demo)
         {
             AllowSetForegroundWindow(-1);   // let the running copy come to the front
