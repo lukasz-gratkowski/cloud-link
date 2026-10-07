@@ -186,7 +186,7 @@ counts below were taken from those files.
 | Product features | `features.txt` | 14 lines, the longest 107 characters | 20 features of 200 characters |
 | Keywords (formerly search terms) | `keywords.txt` | 7 terms, 17 words | 7 terms of 40 characters, 21 words; no other products' names (policy 10.1.3) |
 | Copyright and trademark info | `copyright.txt` | 171 characters | 200 |
-| Additional system requirements, minimum | `system-requirements.txt` | 4 lines | 11 of 200 characters |
+| Additional system requirements, minimum | `system-requirements.txt` | 5 lines | 11 of 200 characters |
 
 Other fields:
 
