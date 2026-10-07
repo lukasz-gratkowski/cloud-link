@@ -1,0 +1,4 @@
+Internet connection
+A web browser, for sign-in
+A Microsoft account, for OneDrive links
+Your own Google Cloud API key or OAuth client, for Google Drive links

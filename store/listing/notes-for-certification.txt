@@ -1,0 +1,19 @@
+Date: [DATE]. AMG CloudLink [VERSION], first submission.
+
+The app downloads the files behind a OneDrive or Google Drive share link into a folder you choose. It only downloads (Microsoft Graph, Google Drive API). No purchases, advertising, telemetry or account with us.
+
+TEST 1, GOOGLE DRIVE, NO SIGN-IN (2 minutes)
+Google requires credentials that each user creates, so the button reads "Google: set up".
+1. Settings (the gear): paste this test key into "API key (public links)" and press Save: [TEST API KEY]
+2. Paste into "Shared link": [PUBLIC GOOGLE DRIVE SAMPLE LINK]
+3. Press Download. [N] files ([SIZE]) are listed, downloaded and marked Done. "Open folder" shows them.
+The key is a Google Drive API key for public files, not a financial credential.
+
+TEST 2, ONEDRIVE (3 minutes)
+1. Paste into "Shared link": [PUBLIC ONEDRIVE SAMPLE LINK]
+2. Press Download. The browser opens Microsoft's sign-in. Use the test account [TEST ACCOUNT] / [PASSWORD], or any PERSONAL Microsoft account. Work or school accounts usually stop at "Need admin approval" (the organisation's policy).
+3. The permission page names "AMG CloudLink", says "unverified" and that it can edit your files. Both are expected: we are not in the publisher verification programme, and Microsoft Graph opens share links only for apps with a read-write permission. Accept.
+4. The browser says "Signed in" (a localhost page served by the app). In the app [N] files ([SIZE]) are downloaded and marked Done.
+5. Optional: press Stop midway, then Continue.
+
+Guide: https://amgcloud.io/apps/cloudlink/guide/

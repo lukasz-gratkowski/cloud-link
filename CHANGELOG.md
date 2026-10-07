@@ -5,11 +5,35 @@ and versions follow [Semantic Versioning](https://semver.org).
 
 ## [Unreleased]
 
+Version 1.3.0 in the making: the first version that is also built as a Microsoft Store package.
+
+### Added
+- A Microsoft Store package. `build-msix.ps1` builds an MSIX from the same source: an ordinary
+  self-contained folder instead of the single-file exe, the icons and tiles Windows asks for, and a manifest
+  whose identity comes from `store\identity.json`. The Store signs the package. `docs/STORE.md` has the steps;
+  the listing texts and the notes for certification are in `store\listing`.
+- When CloudLink runs from an installed package it names its real data folder
+  (`%LOCALAPPDATA%\Packages\<package family name>\LocalCache\Local\CloudLink`) instead of relying on the private
+  view Windows gives a packaged app of `%LOCALAPPDATA%\CloudLink`. **Help → Open log** therefore works there,
+  Help shows the folder that is really used and can open it, and the Store version leaves the folder of a
+  `CloudLink.exe` on the same PC alone. It also says ", Microsoft Store" after its version, opens the guide on amgcloud.io,
+  refuses to save downloads under AppData (File Explorer would not show them), ignores `--demo`, and lets a
+  Store update wait until it is closed.
+- A **Privacy** button in Help opens the privacy statement.
+
 ### Fixed
 - `build.ps1` writes `SHA256SUMS.txt` with a Unix line ending, so `sha256sum -c` accepts it. (The file
   attached to the 1.2.0 release was corrected by hand.)
 
+- A relative **Save to** folder is no longer resolved against the folder CloudLink happened to be started
+  from; it asks for a full path.
+
 ### Changed
+- The privacy statement covers the Microsoft Store version (where it keeps its data, what Microsoft reports
+  to the publisher) and mentions the look at the clipboard for a share link. The security notes and the user
+  guide say where each version keeps its files.
+- The demo mode, which draws the documentation pictures, uses `you@example.com` as the sample address. The
+  text CloudLink finds on the clipboard is no longer kept in memory while it runs, only a hash of it.
 - Documentation: the README points to the latest release and says what has and has not been tested; the
   signing guide explains the `Status` values and mentions Smart App Control; the user guide covers an error
   on Microsoft's sign-in page and the wording of the Google button.

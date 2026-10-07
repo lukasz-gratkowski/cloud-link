@@ -1,0 +1,14 @@
+Downloads shared folders and single files from OneDrive and Google Drive share links
+Recreates a shared folder on disk with all its subfolders
+Paste one link or several, or drop a link on the window; a link on the clipboard is picked up automatically
+Continues interrupted files from where they stopped, after a lost connection, Stop, a restart or a reboot
+Checks every file against the size and checksum the service reports, and downloads a mismatch again
+Retries network errors, stalls and throttling by itself, and waits when the network is gone
+One progress bar for the whole job with speed and time left, and a status for every file
+Filters that show only the files in progress or only the files with problems
+Exports Google Docs, Sheets and Slides as .docx, .xlsx and .pptx files
+Sign-in happens in your browser; CloudLink never sees a password
+Download only: never uploads, changes or deletes files in the cloud
+Downloaded files are tagged as coming from the internet, so Windows and Office apply their usual caution
+Light and dark theme, following Windows
+No telemetry and no advertising; free and open source under the MIT licence

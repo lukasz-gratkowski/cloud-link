@@ -1,7 +1,7 @@
 <Window x:Class="CloudLink.HelpWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="CloudLink help" Width="620" Height="700" MinWidth="460" MinHeight="420"
+        Title="CloudLink help" Width="620" Height="700" MinWidth="600" MinHeight="420"
         WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Icon="/Assets/CloudLink.ico">
     <Grid TextElement.Foreground="{DynamicResource TextBrush}" Margin="24,20,24,20">
         <Grid.RowDefinitions>
@@ -26,9 +26,11 @@
             <Button DockPanel.Dock="Right" Style="{StaticResource PrimaryButton}" Height="38" IsCancel="True" IsDefault="True" Content="Got it" />
             <Button DockPanel.Dock="Right" Style="{StaticResource GhostButton}" Click="OpenLog_Click" Margin="0,0,10,0" Content="Open log"
                     ToolTip="A record of what happened, useful when asking for help" />
+            <Button DockPanel.Dock="Right" Style="{StaticResource GhostButton}" Click="OpenPrivacy_Click" Margin="0,0,10,0" Content="Privacy"
+                    ToolTip="Opens the privacy statement in your browser" />
             <StackPanel VerticalAlignment="Center" Opacity="0.7">
-                <TextBlock x:Name="VersionText" />
-                <TextBlock Text="© AMG Cloud Engineering" FontSize="11.5" />
+                <TextBlock x:Name="VersionText" TextTrimming="CharacterEllipsis" />
+                <TextBlock Text="© AMG Cloud Engineering" FontSize="11.5" TextTrimming="CharacterEllipsis" />
             </StackPanel>
         </DockPanel>
     </Grid>

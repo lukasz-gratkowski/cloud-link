@@ -34,12 +34,12 @@ public partial class MainWindow : Window
     long _lastTransferred;
     long _lastTick;
     double _speed;
-    string _lastClipboardOffer = "";
+    int _lastClipboardOffer;   // a hash of the clipboard text last looked at; the text itself is not kept
 
     public MainWindow()
     {
         InitializeComponent();
-        VersionText.Text = "Version " + AppInfo.Display;
+        VersionText.Text = "Version " + AppInfo.Brief;
         string last = _services.Settings.LastFolder;
         DestinationBox.Text = KeepOutOfProgramFolder(last.Length > 0 ? last
             : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Downloads"));
@@ -87,8 +87,8 @@ public partial class MainWindow : Window
         {
             if (!Clipboard.ContainsText()) return;
             string text = Clipboard.GetText().Trim();
-            if (text.Length is 0 or > 4000 || text == _lastClipboardOffer) return;
-            _lastClipboardOffer = text;
+            if (text.Length is 0 or > 4000 || text.GetHashCode() == _lastClipboardOffer) return;
+            _lastClipboardOffer = text.GetHashCode();
             if (ParseLinks(text, out string? problem).Count > 0 && problem is null)
             {
                 LinksBox.Text = text;
@@ -373,7 +373,12 @@ public partial class MainWindow : Window
         string destination = DestinationBox.Text.Trim();
         try
         {
+            // A packaged app has no working directory worth resolving a relative name against.
+            if (!Path.IsPathFullyQualified(destination))
+                throw new ArgumentException(@"Enter the full path of a folder, for example C:\Users\you\Downloads, or press Browse.");
             destination = KeepOutOfProgramFolder(Path.GetFullPath(destination));
+            if (AppPackage.IsPackaged && AppPaths.IsUnderAppData(destination))
+                throw new ArgumentException("The Microsoft Store version of CloudLink cannot save under AppData: Windows may keep such files where File Explorer does not show them. Choose another folder, for example Downloads.");
             Directory.CreateDirectory(destination);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException)
@@ -824,7 +829,7 @@ public partial class MainWindow : Window
             BodyShift.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(14, 0, TimeSpan.FromMilliseconds(550)) { EasingFunction = ease });
         }
         LinksBox.Focus();
-        if (Environment.GetCommandLineArgs().Contains("--demo")) ShowDemo();
+        if (App.Demo) ShowDemo();
     }
 
     // Development aid: "CloudLink.exe --demo" shows the window with sample rows; tools\screenshots.ps1 uses it.
@@ -843,7 +848,7 @@ public partial class MainWindow : Window
         DestinationBox.Text = @"C:\Users\you\Downloads";
         VersionText.Text = "Version " + AppInfo.Version;
         // Never the real accounts: these pictures end up in the documentation.
-        MicrosoftText.Text = "you@outlook.com";
+        MicrosoftText.Text = "you@example.com";
         MicrosoftDot.SetResourceReference(Shape.FillProperty, "OkBrush");
         GoogleText.Text = "Google: set up";
         GoogleDot.SetResourceReference(Shape.FillProperty, "IdleBrush");
@@ -904,7 +909,7 @@ public partial class MainWindow : Window
             MicrosoftText.Text = "Microsoft: sign in";
             MicrosoftDot.SetResourceReference(Shape.FillProperty, "IdleBrush");
             bool signedIn = args.Contains("--signed-in");
-            GoogleText.Text = signedIn ? "you@gmail.com" : "Google: set up";
+            GoogleText.Text = signedIn ? "you@example.com" : "Google: set up";
             GoogleDot.SetResourceReference(Shape.FillProperty, signedIn ? "OkBrush" : "IdleBrush");
             _items =
             [

@@ -9,8 +9,28 @@ namespace CloudLink.Core;
 
 public static class AppPaths
 {
-    public static string Root { get; set; } = Path.Combine(
-        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CloudLink");
+    static readonly string Usual = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+    /// <summary>%LOCALAPPDATA%\CloudLink; for the Store version the real folder behind that name (see AppPackage).</summary>
+    public static string Root { get; set; } = Path.Combine(AppPackage.LocalAppData, "CloudLink");
+
+    /// <summary>Root in a form that can be pasted into File Explorer's address bar.</summary>
+    public static string Shown => Abbreviate(Root);
+
+    /// <summary>A folder below the profile's Local AppData, written with %LOCALAPPDATA%; any other folder unchanged.</summary>
+    internal static string Abbreviate(string folder) =>
+        folder.StartsWith(Usual + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+            ? "%LOCALAPPDATA%" + folder[Usual.Length..] : folder;
+
+    /// <summary>True for a folder under the profile's AppData, the parent of Local and Roaming.</summary>
+    public static bool IsUnderAppData(string folder)
+    {
+        // The same folder can be written with a \\?\ prefix.
+        if (folder.StartsWith(@"\\?\", StringComparison.Ordinal) || folder.StartsWith(@"\\.\", StringComparison.Ordinal)) folder = folder[4..];
+        string appData = Path.TrimEndingDirectorySeparator(Path.GetDirectoryName(Usual)!) + Path.DirectorySeparatorChar;
+        return (Path.TrimEndingDirectorySeparator(folder) + Path.DirectorySeparatorChar)
+            .StartsWith(appData, StringComparison.OrdinalIgnoreCase);
+    }
 
     public static string File(string name)
     {
@@ -123,7 +143,12 @@ public static class AppInfo
     public static string Version => Informational.Split('+')[0];
     public static string Commit => Informational.Contains('+') ? new string(Informational.Split('+')[1].Take(7).ToArray()) : "";
     public static bool ShowCommit { get; set; } = true;
-    public static string Display => ShowCommit && Commit.Length > 0 ? $"{Version} ({Commit})" : Version;
+    // The Store version says so: it and a plain CloudLink.exe on the same PC bring each other's window forward.
+    public static string Display => (ShowCommit && Commit.Length > 0 ? $"{Version} ({Commit})" : Version)
+        + (AppPackage.IsPackaged ? ", Microsoft Store" : "");
+
+    /// <summary>For the short line under the name in the main window, where there is little room.</summary>
+    public static string Brief => AppPackage.IsPackaged ? Version + ", Microsoft Store" : Display;
 }
 
 public static class Log

@@ -73,6 +73,7 @@ More detail is in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 - [User guide](docs/USER-GUIDE.md): downloading, accounts, the Google Drive setup step by step, troubleshooting
   (also at <https://amgcloud.io/apps/cloudlink/guide/>)
 - [Verifying and signing](docs/SIGNING.md): the signature, checksums, and signing your own build
+- [Microsoft Store](docs/STORE.md): building the Store package, the listing, and the submission step by step
 - [Microsoft app registration](docs/APP-REGISTRATION.md): what users need (nothing), and what a fork needs
 - [Architecture](docs/ARCHITECTURE.md): how the code is organised and why
 - [Brand](docs/BRAND.md): logo, colours and interface principles
@@ -95,6 +96,15 @@ for an unsigned one. See [docs/SIGNING.md](docs/SIGNING.md).
 
 The tests drive the real download engine and both providers against a local server that cuts connections,
 stalls, throttles and corrupts data.
+
+```powershell
+.\build-msix.ps1
+```
+
+builds the package for the Microsoft Store instead (`publish-store\CloudLink_<version>.0_x64.msix`, unsigned:
+the Store signs it). It needs `makeappx.exe` and `makepri.exe` from the Windows SDK, the package identity
+from Partner Center in `store\identity.json`, and a committed working tree; `-DryRun` tries the build with a
+made-up identity. See [docs/STORE.md](docs/STORE.md).
 
 ## Licence
 

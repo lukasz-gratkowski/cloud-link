@@ -11,7 +11,8 @@ src/CloudLink
 │   ├── Errors.cs          error classification, backoff, JSON GET with retry
 │   ├── Hashing.cs         QuickXorHash, streaming MD5 / SHA-1 / SHA-256
 │   ├── PathSafety.cs      Windows-safe, unique file names
-│   └── Settings.cs        settings, version info, log
+│   ├── AppPackage.cs      what differs when installed as a package (the Microsoft Store version)
+│   └── Settings.cs        settings, the data folder, version info, log
 ├── Providers/
 │   ├── OneDriveProvider.cs     Microsoft Graph shares API
 │   └── GoogleDriveProvider.cs  Google Drive v3 API
@@ -21,7 +22,8 @@ src/CloudLink
 ├── HelpWindow.xaml(.cs)   in-app help
 └── SettingsWindow.xaml(.cs)
 tests/CloudLink.Tests      engine, provider and sign-in tests against a scripted local HTTP server
-tools/                     icon and screenshot generators, app-registration check
+tools/                     icon, Store asset and screenshot generators, app-registration check
+store/                     manifest, identity and listing texts of the Microsoft Store package (built by build-msix.ps1)
 branding/                  logo files for use outside the program
 ```
 

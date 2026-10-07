@@ -1,0 +1,41 @@
+Needs an internet connection and a web browser. OneDrive links need a Microsoft account. Google Drive™ links need credentials that you create yourself, once, in the Google Cloud console. Details are under "Before you start" below.
+
+AMG CloudLink downloads shared folders and files from OneDrive and Google Drive to your Windows PC.
+
+A browser fetches a large shared folder as one zip archive. On a big folder that can fail or time out, and one dropped connection means starting again. CloudLink downloads the files themselves, one by one, continues whatever was interrupted, and checks each file before calling it done.
+
+HOW TO USE IT
+1. Paste a share link. Several links go on separate lines. You can also drop a link on the window.
+2. Choose the folder to save to.
+3. Press Download.
+
+CloudLink first looks through the link to find every file, then downloads four files at a time (you can change the number in Settings). A shared folder named Holiday is saved as a folder named Holiday, with all its subfolders.
+
+WHAT YOU GET
+Whole folders. A shared folder is recreated on disk as it is in the cloud. Links to single files work too.
+Continue after an interruption. Press Stop, close the program, lose the connection or restart the PC. Start again with the same link and folder, and CloudLink carries on from where it stopped. Complete files are not downloaded twice.
+Checked files. Each file is compared with the size and checksum the service reports. A file that does not match is downloaded again. Only a complete, checked file gets its real name.
+Recovery without your help. Network errors, stalls, throttling and server errors are retried with growing pauses. If the network disappears, CloudLink waits for it.
+A clear view. One progress bar for the whole job with speed and time left, a status for every file, and a filter that shows only what needs attention.
+Google documents. Google Docs, Sheets and Slides are exported as .docx, .xlsx and .pptx files.
+
+BEFORE YOU START
+OneDrive. The first download opens your browser for a Microsoft sign-in. With a personal Microsoft account there is nothing else to set up. Microsoft's permission page says that the app can edit your files. Microsoft only opens share links for apps that hold a read and write permission, so CloudLink has to ask for it. CloudLink only downloads: it never uploads, changes or deletes files. Opening a link records your account as having opened it, as opening it in a browser does. The same page calls the app "unverified". That refers to a Microsoft programme for publishers, not to the program itself.
+
+Work and school accounts. Links from an organisation's OneDrive or SharePoint need a work or school account. Most organisations do not let their people approve an app like this themselves, so an administrator may have to approve CloudLink once for the organisation. If Microsoft's page says "Need admin approval", that is the reason.
+
+Google Drive. CloudLink has no Google registration of its own, so you create access for it yourself in the Google Cloud console: an API key for links that anyone can open, or an OAuth client for private links. You do this once. It takes ten to fifteen minutes and is free of charge today. The user guide on the product website walks through both routes step by step, with pictures.
+
+OTHER LIMITS
+Windows 10 or 11, 64-bit.
+Google Forms, Sites and My Maps have no file content and are listed as skipped.
+A Google document larger than 10 MB can be exported only when signed in, not with an API key.
+CloudLink downloads what a share link gives your account access to. You are responsible for having the right to download and keep it.
+
+PRIVACY
+CloudLink runs on your PC and talks only to Microsoft and Google, for the links you give it. It contains no telemetry and no advertising, and it sends nothing to AMG Cloud Engineering. You sign in on Microsoft's or Google's own pages in your browser, so CloudLink never sees a password. Sign-ins are stored on your PC, encrypted for your Windows account.
+
+FREE AND OPEN SOURCE
+CloudLink is free and published under the MIT licence. The source code is public on GitHub.
+
+AMG CloudLink is not affiliated with, endorsed by or sponsored by Microsoft or Google. Microsoft, OneDrive and SharePoint are trademarks of the Microsoft group of companies. Google Drive is a trademark of Google LLC.

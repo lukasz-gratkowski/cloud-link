@@ -6,15 +6,19 @@
   OneDrive link records the signed-in account as having opened it, as opening it in a browser does.
 - It never runs, opens or unpacks what it downloads.
 - It talks only to Microsoft's and Google's sign-in and API hosts, and to the storage addresses those APIs
-  redirect to. There is no telemetry and no update check.
+  redirect to. There is no telemetry and no update check. (The Microsoft Store version, which is being
+  prepared under the name AMG CloudLink, is updated by the Store.)
 
 ## Sign-in and stored data
 
 - Sign-in happens in your browser using OAuth 2.0 authorization code with PKCE. CloudLink never sees a
   password. The redirect is received on a random loopback port (`127.0.0.1` / `::1` only) and is accepted
   only with the matching `state` value.
-- Refresh tokens, the Google API key and the Google client secret are stored in `%LOCALAPPDATA%\CloudLink`,
-  encrypted with Windows DPAPI for the current user. Access tokens are kept in memory only.
+- Refresh tokens, the Google API key and the Google client secret are stored in CloudLink's data folder,
+  encrypted with Windows DPAPI for the current user. Access tokens are kept in memory only. The folder is
+  `%LOCALAPPDATA%\CloudLink`; for the Microsoft Store version it is a folder of that name inside the package's
+  own data folder (`%LOCALAPPDATA%\Packages\AMGCloudEngineering.AMGCloudLink_zwcny3vzz9sd6\LocalCache\Local\CloudLink`), which
+  Windows removes when the app is uninstalled. **Help** shows the address and can open the folder.
 - `settings.json` in the same folder also holds, unencrypted, the address of each signed-in account, the last
   folder saved to, and the application and client IDs.
 - Access tokens are sent only to the API host. They are not forwarded on redirects to storage hosts, and
@@ -43,7 +47,8 @@ entering its ID in **Settings**; see [docs/APP-REGISTRATION.md](docs/APP-REGISTR
 
 ## Release integrity
 
-Releases carry an Authenticode signature and a `SHA256SUMS.txt`. See [docs/SIGNING.md](docs/SIGNING.md).
+Releases on GitHub carry an Authenticode signature and a `SHA256SUMS.txt`. See [docs/SIGNING.md](docs/SIGNING.md).
+The Microsoft Store version is a package that the Store checks and signs.
 
 ## Reporting a vulnerability
 

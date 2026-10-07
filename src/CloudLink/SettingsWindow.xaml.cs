@@ -62,8 +62,11 @@ public partial class SettingsWindow : Window
         DialogResult = true;
     }
 
+    // The same guide in both places; the Store version opens the copy on the product website.
     void OpenGuide_Click(object sender, RoutedEventArgs e) =>
-        Process.Start(new ProcessStartInfo("https://github.com/lukasz-gratkowski/cloud-link/blob/main/docs/USER-GUIDE.md#google-drive") { UseShellExecute = true });
+        Process.Start(new ProcessStartInfo(AppPackage.IsPackaged
+            ? "https://amgcloud.io/apps/cloudlink/guide/#google-drive"
+            : "https://github.com/lukasz-gratkowski/cloud-link/blob/main/docs/USER-GUIDE.md#google-drive") { UseShellExecute = true });
 
     void OpenEntra_Click(object sender, RoutedEventArgs e) =>
         Process.Start(new ProcessStartInfo("https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade") { UseShellExecute = true });

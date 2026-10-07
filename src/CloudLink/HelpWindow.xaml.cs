@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using CloudLink.Core;
 
 namespace CloudLink;
@@ -35,13 +36,15 @@ public partial class HelpWindow : Window
             "CloudLink only downloads: it never uploads, changes or deletes files in the cloud, and never runs what it downloads. " +
             "Opening a OneDrive link records your account as having opened it, just as opening it in a browser does. " +
             "Files are tagged as coming from the internet, so Windows and Office apply their usual caution when you open them. " +
-            "Your sign-ins are stored encrypted for your Windows account in %LOCALAPPDATA%\\CloudLink and nowhere else."),
+            "Your sign-ins are stored encrypted for your Windows account in " + AppPaths.Shown + " and nowhere else."),
     ];
 
     public HelpWindow()
     {
         InitializeComponent();
         VersionText.Text = "CloudLink " + AppInfo.Display;
+        VersionText.ToolTip = VersionText.Text;
+        StackPanel? last = null;
         foreach (var (glyph, title, text) in Sections)
         {
             var icon = new TextBlock
@@ -56,6 +59,7 @@ public partial class HelpWindow : Window
             var words = new StackPanel();
             words.Children.Add(new TextBlock { Text = title, FontSize = 15, FontWeight = FontWeights.SemiBold });
             words.Children.Add(new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap, Opacity = 0.8, LineHeight = 20, Margin = new Thickness(0, 4, 0, 0) });
+            last = words;
             var row = new DockPanel();
             DockPanel.SetDock(icon, Dock.Left);
             row.Children.Add(icon);
@@ -68,6 +72,17 @@ public partial class HelpWindow : Window
                 Child = row,
             });
         }
+
+        // The last card names the data folder. In the Store version that is a long address, so it can be opened from here.
+        var open = new Hyperlink(new Run("Open that folder"));
+        open.SetResourceReference(TextElement.ForegroundProperty, "ActiveBrush");
+        open.Click += (_, _) =>
+        {
+            Directory.CreateDirectory(AppPaths.Root);
+            string explorer = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe");
+            Process.Start(new ProcessStartInfo(explorer) { ArgumentList = { AppPaths.Root } });
+        };
+        last!.Children.Add(new TextBlock(open) { Margin = new Thickness(0, 6, 0, 0) });
     }
 
     void OpenLog_Click(object sender, RoutedEventArgs e)
@@ -75,4 +90,7 @@ public partial class HelpWindow : Window
         if (!File.Exists(Log.FilePath)) Log.Write("Log opened from Help.");
         Process.Start(new ProcessStartInfo(Path.Combine(Environment.SystemDirectory, "notepad.exe")) { ArgumentList = { Log.FilePath } });
     }
+
+    void OpenPrivacy_Click(object sender, RoutedEventArgs e) =>
+        Process.Start(new ProcessStartInfo("https://amgcloud.io/apps/cloudlink/privacy/") { UseShellExecute = true });
 }

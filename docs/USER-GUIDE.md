@@ -264,6 +264,10 @@ been used for six months.
 
 ## Checking your download
 
+This section is about `CloudLink.exe` downloaded from GitHub. A Microsoft Store version, named AMG CloudLink,
+is being prepared; a copy installed from the Store is checked and signed by the Store, and none of this
+applies to it.
+
 CloudLink's exe is signed, but with a self-signed certificate. Windows therefore shows *Windows protected your
 PC* the first time you start it (choose **More info → Run anyway**) and lists the publisher as unknown. Your
 browser may also ask you to confirm keeping the download. If Smart App Control is switched on in Windows 11,
@@ -306,7 +310,17 @@ file has small letters. [Verifying and signing](SIGNING.md) explains the signatu
 
 ## Where things are kept
 
-`%LOCALAPPDATA%\CloudLink` holds:
+CloudLink keeps its settings, sign-ins and log in one folder. **Help** shows its address and can open it.
+
+- `CloudLink.exe` from GitHub: `%LOCALAPPDATA%\CloudLink`. It stays until you delete it.
+- Installed from the Microsoft Store:
+  `%LOCALAPPDATA%\Packages\AMGCloudEngineering.AMGCloudLink_zwcny3vzz9sd6\LocalCache\Local\CloudLink`. Windows removes it
+  when CloudLink is uninstalled.
+
+The two versions do not share settings or sign-ins, and only one of them runs at a time: starting the second
+brings the first one's window forward.
+
+The folder holds:
 
 - `settings.json`: your settings, including the address of each signed-in account and the last folder used.
   The Google API key and client secret in it are encrypted for your Windows account.

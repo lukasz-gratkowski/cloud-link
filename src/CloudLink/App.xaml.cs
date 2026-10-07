@@ -23,7 +23,7 @@ public partial class App : Application
         // Two copies writing the same .part files would only get in each other's way.
         _single = new Mutex(true, @"Local\CloudLink.SingleInstance", out bool first);
         var wake = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\CloudLink.Wake");
-        bool demo = e.Args.Contains("--demo");
+        bool demo = Demo;
         AppInfo.ShowCommit = !demo;   // documentation pictures should not carry a commit
         Theme.Still = demo;           // nor be caught half-way through an animation
         if (!first && !demo)
@@ -55,6 +55,9 @@ public partial class App : Application
     }
 
     Mutex? _single;
+
+    /// <summary>The sample window for documentation pictures ("--demo"); never in an installed package.</summary>
+    public static bool Demo { get; } = !AppPackage.IsPackaged && Environment.GetCommandLineArgs().Contains("--demo");
 
     [DllImport("user32.dll")]
     static extern bool AllowSetForegroundWindow(int processId);

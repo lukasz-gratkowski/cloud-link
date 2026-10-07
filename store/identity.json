@@ -1,0 +1,9 @@
+{
+  "_comment": "Copied from Partner Center > AMG CloudLink > Product management > Product identity on 7 October 2026. DisplayName is the reserved product name. These values are printed inside every package and are not secrets. See docs/STORE.md.",
+  "IdentityName": "AMGCloudEngineering.AMGCloudLink",
+  "Publisher": "CN=3CB22127-D696-4E4D-82B3-C7A209F636F1",
+  "PublisherDisplayName": "AMG Cloud Engineering",
+  "DisplayName": "AMG CloudLink",
+  "PackageFamilyName": "AMGCloudEngineering.AMGCloudLink_zwcny3vzz9sd6",
+  "StoreId": "9NWN67GFKTF3"
+}

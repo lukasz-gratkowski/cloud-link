@@ -1,8 +1,10 @@
 # Renders the app's main states to docs\images, without touching any real account or download.
 # A shot may name controls to point at; they are outlined and numbered in the order given.
+# -Only takes one or more names or wildcards, for example -Only downloading-*, done-dark. Type such a list in a
+# PowerShell window; "pwsh -File" passes it on as loose words, not as a list.
 param([string]$Exe = (Join-Path $PSScriptRoot '..\src\CloudLink\bin\Release\net10.0-windows\CloudLink.exe'),
       [string]$Out = (Join-Path $PSScriptRoot '..\docs\images'),
-      [string]$Only)
+      [string[]]$Only)
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing, UIAutomationClient, UIAutomationTypes
 Add-Type @"
@@ -21,6 +23,7 @@ public static class Shot {
 "@
 [Shot]::SetProcessDPIAware() | Out-Null
 New-Item -ItemType Directory -Force $Out | Out-Null
+$Out = (Resolve-Path -LiteralPath $Out).Path   # .NET resolves a relative path against another folder than PowerShell does
 
 # The colour of the numbered marks: readable on the light and the dark theme alike.
 $markColour = [Drawing.Color]::FromArgb(0xFF, 0x95, 0x00)
@@ -128,7 +131,10 @@ $shots = @(
     @{ Name = 'google-signin-3-waiting';       Flags = '--dark', '--google-private', '--empty', '--waiting';  Title = 'CloudLink' },
     @{ Name = 'google-signin-4-done';         Flags = '--dark', '--google-private', '--signed-in';           Title = 'CloudLink';          Highlight = 'Google account' }
 )
-if ($Only) { $shots = $shots | Where-Object { $_.Name -like $Only } }
+if ($Only) {
+    $shots = @($shots | Where-Object { $name = $_.Name; $Only | Where-Object { $name -like $_ } })
+    if (-not $shots) { throw "No picture is named like: $($Only -join ', ')" }
+}
 
 foreach ($s in $shots) {
     $p = Start-Process $Exe -ArgumentList (@('--demo', '--software') + $s.Flags) -PassThru
