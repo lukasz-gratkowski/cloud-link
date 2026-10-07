@@ -5,9 +5,10 @@ the package, so Windows knows the publisher: no *Windows protected your PC*, no 
 Control, and updates arrive through the Store. `CloudLink.exe` on GitHub stays as it is.
 
 State on 7 October 2026: the product name is reserved, the package builds, and a build registered on the
-development PC passed the checks in section 4 except the sign-in and download with a Microsoft account. Nothing
-has been submitted or certified yet, so sections 5 to 10 are a plan, written from Microsoft's documentation of
-that day (Store Policies 7.19 and 7.20, App Developer Agreement 8.11).
+development PC passed the checks in section 4, including a Google Drive download with an API key. Still to
+do there: the Microsoft sign-in with a OneDrive download, the run without a network, and the Windows App
+Certification Kit. Nothing has been submitted or certified yet, so sections 5 to 10 are a plan, written from
+Microsoft's documentation of that day (Store Policies 7.19 and 7.20, App Developer Agreement 8.11).
 
 **Contents**
 
@@ -120,10 +121,12 @@ app. Then check:
 | Remove the registration (or uninstall) | The `Packages\AMGCloudEngineering.AMGCloudLink_zwcny3vzz9sd6` folder is gone; `%TEMP%\.net\CloudLink` got no new folder |
 
 Microsoft also asks for a run of the Windows App Certification Kit before submitting; it is the technical part
-of certification. It needs the package installed or registered and an elevated prompt:
+of certification. For the registered package, from an elevated PowerShell (not run yet for CloudLink):
 
 ```powershell
-& "<Windows Kits>\10\App Certification Kit\appcert.exe" test -appxpackagepath .\publish-store\CloudLink_1.3.0.0_x64.msix -reportoutputpath .\publish-store\wack-report.xml
+cd "<Windows Kits>\10\App Certification Kit"
+.\appcert.exe reset
+.\appcert.exe test -packagefullname (Get-AppxPackage AMGCloudEngineering.AMGCloudLink).PackageFullName -reportoutputpath <full path>\wack-report.xml
 ```
 
 ## 5. Before you submit
@@ -211,7 +214,9 @@ description.
 
 **Screenshots.** One is required, four or more are recommended, ten is the limit; PNG, 1366 × 768 or larger.
 Show only CloudLink's own window with the sample data: no pictures of Microsoft's or Google's pages, no added
-logos or slogans.
+logos or slogans. The window itself names OneDrive and Google Drive in plain text, as it must to be shown
+truthfully. Microsoft's trademark page asks for screenshots free of its product names while the Store policy
+asks for screenshots that show the product as it is; if certification objects, that is the point to answer.
 
 Type this in a PowerShell window (`pwsh -File` does not pass the list on as a list):
 
