@@ -24,7 +24,6 @@ The first version in the Microsoft Store, where CloudLink is listed as AMG Cloud
 ### Fixed
 - `build.ps1` writes `SHA256SUMS.txt` with a Unix line ending, so `sha256sum -c` accepts it. (The file
   attached to the 1.2.0 release was corrected by hand.)
-
 - A relative **Save to** folder is no longer resolved against the folder CloudLink happened to be started
   from; it asks for a full path.
 
