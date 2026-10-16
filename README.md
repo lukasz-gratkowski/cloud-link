@@ -33,9 +33,10 @@ files themselves, one by one, resumes whatever was interrupted, and verifies eac
 
 ## Getting started
 
-1. Download `CloudLink.exe` from the [latest release](../../releases/latest), or [build it](#building). It is a
-   single file; nothing needs installing. See
-   [Verifying a download](docs/SIGNING.md) for the signature and checksum.
+1. Install **AMG CloudLink** from the [Microsoft Store](https://apps.microsoft.com/detail/9NWN67GFKTF3). The Store signs it and keeps it
+   up to date. Or download `CloudLink.exe` from the [latest release](../../releases/latest), or
+   [build it](#building): a single file, nothing to install; see [Verifying a download](docs/SIGNING.md) for its
+   signature and checksum.
 2. Run it and paste a share link.
 3. Choose the folder to save to and press **Download**.
 

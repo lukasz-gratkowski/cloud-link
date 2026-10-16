@@ -4,11 +4,9 @@ The Store version is the same program, built as an MSIX package and listed as **
 the package, so Windows knows the publisher: no *Windows protected your PC*, no blocked start under Smart App
 Control, and updates arrive through the Store. `CloudLink.exe` on GitHub stays as it is.
 
-State on 7 October 2026: the product name is reserved, the package builds, and a build registered on the
-development PC passed the checks in section 4, including a Google Drive download with an API key. Still to
-do there: the Microsoft sign-in with a OneDrive download, the run without a network, and the Windows App
-Certification Kit. Nothing has been submitted or certified yet, so sections 5 to 10 are a plan, written from
-Microsoft's documentation of that day (Store Policies 7.19 and 7.20, App Developer Agreement 8.11).
+State on 16 October 2026: AMG CloudLink 1.3.0 is published in the Microsoft Store, at
+<https://apps.microsoft.com/detail/9NWN67GFKTF3>. Sections 5 to 10 were written before the first submission, from
+Microsoft's documentation of 7 October 2026 (Store Policies 7.19 and 7.20, App Developer Agreement 8.11).
 
 **Contents**
 

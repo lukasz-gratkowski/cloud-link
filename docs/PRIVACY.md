@@ -1,13 +1,13 @@
 # CloudLink privacy statement
 
-*Last updated: 7 October 2026*
+*Last updated: 16 October 2026*
 
 CloudLink is a program that runs on your own computer. AMG Cloud Engineering, its publisher, operates no
 service for it, and **CloudLink sends the publisher nothing**: no account details, no file names, no usage
 statistics.
 
-A Microsoft Store version, named AMG CloudLink, is being prepared. If you install CloudLink from the Microsoft
-Store, the Store installs and updates it under Microsoft's own privacy statement, and Microsoft shows the
+CloudLink is also published in the Microsoft Store, as AMG CloudLink. If you install it from there, the Store
+installs and updates it under Microsoft's own privacy statement, and Microsoft shows the
 publisher summary figures about installs, use and crashes of the Store version, including crash reports that
 Windows error reporting collects. Whether such reports are sent is decided by the diagnostic data setting in
 Windows. The publisher uses them only to find faults. CloudLink itself still sends nothing.

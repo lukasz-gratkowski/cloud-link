@@ -3,9 +3,9 @@
 All notable changes are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com),
 and versions follow [Semantic Versioning](https://semver.org).
 
-## [Unreleased]
+## [1.3.0] - 2026-10-16
 
-Version 1.3.0 in the making: the first version that is also built as a Microsoft Store package.
+The first version in the Microsoft Store, where CloudLink is listed as AMG CloudLink.
 
 ### Added
 - A Microsoft Store package. `build-msix.ps1` builds an MSIX from the same source: an ordinary

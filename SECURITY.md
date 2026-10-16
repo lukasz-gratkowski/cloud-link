@@ -6,8 +6,8 @@
   OneDrive link records the signed-in account as having opened it, as opening it in a browser does.
 - It never runs, opens or unpacks what it downloads.
 - It talks only to Microsoft's and Google's sign-in and API hosts, and to the storage addresses those APIs
-  redirect to. There is no telemetry and no update check. (The Microsoft Store version, which is being
-  prepared under the name AMG CloudLink, is updated by the Store.)
+  redirect to. There is no telemetry and no update check. (The Microsoft Store version, AMG CloudLink, is
+  updated by the Store.)
 
 ## Sign-in and stored data
 

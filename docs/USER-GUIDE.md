@@ -2,6 +2,7 @@
 
 **Contents**
 
+- [Getting CloudLink](#getting-cloudlink)
 - [The window](#the-window)
 - [Downloading](#downloading)
 - [OneDrive and SharePoint](#onedrive-and-sharepoint)
@@ -12,6 +13,13 @@
 - [Checking your download](#checking-your-download)
 - [Troubleshooting](#troubleshooting)
 - [Where things are kept](#where-things-are-kept)
+
+## Getting CloudLink
+
+- **Microsoft Store**: install [AMG CloudLink](https://apps.microsoft.com/detail/9NWN67GFKTF3). The Store signs it and keeps it up to date.
+- **GitHub**: download `CloudLink.exe` from the
+  [latest release](https://github.com/lukasz-gratkowski/cloud-link/releases/latest). It is a single file that
+  needs no installing; see [Checking your download](#checking-your-download).
 
 ## The window
 
@@ -264,9 +272,8 @@ been used for six months.
 
 ## Checking your download
 
-This section is about `CloudLink.exe` downloaded from GitHub. A Microsoft Store version, named AMG CloudLink,
-is being prepared; a copy installed from the Store is checked and signed by the Store, and none of this
-applies to it.
+This section is about `CloudLink.exe` downloaded from GitHub. A copy installed from the Microsoft Store
+(AMG CloudLink) is checked and signed by the Store, and none of this applies to it.
 
 CloudLink's exe is signed, but with a self-signed certificate. Windows therefore shows *Windows protected your
 PC* the first time you start it (choose **More info → Run anyway**) and lists the publisher as unknown. Your
