@@ -146,9 +146,16 @@ signing in.
   administrator approval link works.
 - **Branding & properties**:
   - Logo: `branding/CloudLink-logo-215-opaque.png` (see [BRAND.md](BRAND.md)).
-  - Home page URL: `https://github.com/lukasz-gratkowski/cloud-link`
-  - Terms of service URL: `https://github.com/lukasz-gratkowski/cloud-link/blob/main/docs/TERMS.md`
-  - Privacy statement URL: `https://github.com/lukasz-gratkowski/cloud-link/blob/main/docs/PRIVACY.md`
+  - Home page URL: `https://amgcloud.io/apps/cloudlink/`
+  - Terms of service URL: `https://amgcloud.io/apps/cloudlink/terms/`
+  - Privacy statement URL: `https://amgcloud.io/apps/cloudlink/privacy/`
+  - Publisher domain: `amgcloud.io`, chosen under **Select a verified domain**. It is a verified domain of
+    the tenant, so no file has to be hosted for it. The file
+    `https://amgcloud.io/.well-known/microsoft-identity-association.json` is published as a fallback for
+    **Verify a new domain**.
+- The terms and privacy pages are copies of [TERMS.md](TERMS.md) and [PRIVACY.md](PRIVACY.md), so when either
+  file changes, the copy on amgcloud.io (repository `D:\website\amg_cloud`, `content\cloudlink\terms.md` and
+  `privacy.md`) must be updated as well.
 - After any change: one sign-in with a personal Microsoft account, and one with a work or school account from
   another organisation.
 
