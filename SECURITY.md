@@ -5,9 +5,9 @@
 - It only downloads from OneDrive and Google Drive. It never uploads, changes or deletes files there. Opening a
   OneDrive link records the signed-in account as having opened it, as opening it in a browser does.
 - It never runs, opens or unpacks what it downloads.
-- It talks only to Microsoft's and Google's sign-in and API hosts, and to the storage addresses those APIs
-  redirect to. There is no telemetry and no update check. (The Microsoft Store version, AMG CloudLink, is
-  updated by the Store.)
+- It talks only to Microsoft's and Google's sign-in and API hosts, to the SharePoint host of a work or
+  school link, and to the storage addresses those hosts hand out or redirect to. There is no telemetry and
+  no update check. (The Microsoft Store version, AMG CloudLink, is updated by the Store.)
 
 ## Sign-in and stored data
 
@@ -24,6 +24,22 @@
 - Access tokens are sent only to the API host. They are not forwarded on redirects to storage hosts, and
   listing pages or export links that point to another host are refused.
 - The log (`cloudlink.log`) records file names and error messages. It does not record tokens or keys.
+
+## Work or school links opened without an account
+
+- A work or school link (`...sharepoint.com`) is first visited without a sign-in, the way a private browser
+  window visits it, whether or not an account is signed in. To SharePoint it is an anonymous use of the link
+  from your internet address.
+- On that visit CloudLink takes each redirect itself and goes only to SharePoint hosts, over HTTPS. A link
+  that leads anywhere else, such as the Microsoft sign-in page, is not followed there; it is opened through
+  the sign-in instead.
+- The guest cookie SharePoint sets is kept in memory, in a cookie store used for that link alone, and is
+  never written to disk. It is not sent with downloads: files come from the download addresses SharePoint
+  hands out, which carry their own short-lived key, and no access token is sent to them either.
+- A listing page that points to another host is refused.
+- These requests carry a User-Agent that begins like a Windows browser's and then names CloudLink and its
+  version. SharePoint does not serve a guest otherwise.
+- The log records the hosts and the outcome of the visit, not the link, the cookie or a download address.
 
 ## Downloaded files
 

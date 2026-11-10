@@ -29,6 +29,7 @@ public partial class MainWindow : Window
     DownloadEngine? _engine;
     CancellationTokenSource? _cts;
     bool _busy, _downloading, _looking, _moving;
+    bool _counting;   // the status card is showing the search for files, so the running count belongs under it
     int _filterSignature = -1;
     int _scanned, _ticks;
     long _lastTransferred;
@@ -185,7 +186,7 @@ public partial class MainWindow : Window
             return;
         }
         if (!MicrosoftConfigured()) return;
-        await RunSignInAsync(SignInMicrosoftAsync);
+        await RunSignInAsync(ct => SignInMicrosoftAsync(ct));
     }
 
     const string MicrosoftSetupReason = "This build of CloudLink has no Microsoft application ID built in, so OneDrive needs one entered below.";
@@ -247,9 +248,11 @@ public partial class MainWindow : Window
         }
     }
 
-    async Task SignInMicrosoftAsync(CancellationToken ct)
+    /// <param name="why">A sentence, shown first, on why the sign-in is asked for when that is not obvious.</param>
+    async Task SignInMicrosoftAsync(CancellationToken ct, string? why = null)
     {
-        Say(Stage.Looking, "Waiting for the Microsoft sign-in", "Finish signing in in your browser. Microsoft's page mentions editing files; " +
+        Say(Stage.Looking, "Waiting for the Microsoft sign-in", (why is null ? "" : why + " ") +
+            "Finish signing in in your browser. Microsoft's page mentions editing files; " +
             "that permission is what lets an app open share links, and CloudLink only downloads. Stop cancels.");
         await _services.MicrosoftAuth.SignInAsync(ct);
         Activate();
@@ -270,13 +273,18 @@ public partial class MainWindow : Window
         UpdateAccountButtons();
     }
 
+    /// <summary>Whether the link is tried without a sign-in first, as a work or school link shared with anyone can be.</summary>
+    bool MayOpenWithoutSignIn((Uri Link, ICloudProvider Provider) l) =>
+        ReferenceEquals(l.Provider, _services.OneDrive) && _services.OneDrive.MayOpenWithoutSignIn(l.Link);
+
     /// <summary>Makes sure the service behind a link can be reached, signing in if that is what is missing.</summary>
-    async Task<bool> EnsureAccessAsync(ICloudProvider provider, CancellationToken ct)
+    /// <param name="why">Shown with the Microsoft sign-in when it is asked for in the middle of a run.</param>
+    async Task<bool> EnsureAccessAsync(ICloudProvider provider, CancellationToken ct, string? why = null)
     {
         if (provider == _services.OneDrive)
         {
             if (!MicrosoftConfigured()) return false;
-            if (!await StoredSignInWorksAsync(_services.MicrosoftAuth, ct)) await SignInMicrosoftAsync(ct);
+            if (!await StoredSignInWorksAsync(_services.MicrosoftAuth, ct)) await SignInMicrosoftAsync(ct, why);
             return true;
         }
         bool hadGoogleSignIn = _services.GoogleAuth.IsSignedIn;
@@ -408,7 +416,9 @@ public partial class MainWindow : Window
         object? opening = null;   // the service whose link is being looked through
         try
         {
-            foreach (var provider in links.Select(l => l.Provider).Distinct())
+            // A work or school link shared with anyone who has it opens without an account, as it does
+            // in a private browser window; the sign-in is asked for only if such a link turns out not to.
+            foreach (var provider in links.Where(l => !MayOpenWithoutSignIn(l)).Select(l => l.Provider).Distinct())
             {
                 Say(Stage.Looking, "Checking the sign-in", "");
                 if (!await EnsureAccessAsync(provider, ct))
@@ -420,17 +430,40 @@ public partial class MainWindow : Window
 
             _scanned = 0;
             step = "The link could not be opened";
-            Say(Stage.Looking, "Looking through the shared items", "Finding every file and folder behind the link.");
+            SayLooking();
             var found = new List<FileItem>();
             var roots = new HashSet<string>();
             foreach (var (link, provider) in links)
             {
                 opening = provider;
-                await Task.Run(() => _engine.ScanAsync(provider, link, destination, item =>
+                int foundBefore = found.Count;
+                string[] rootsBefore = [.. roots];
+                Task Scan() => Task.Run(() => _engine.ScanAsync(provider, link, destination, item =>
                 {
                     lock (found) found.Add(item);
                     Interlocked.Increment(ref _scanned);
                 }, ct, roots), ct);
+                try
+                {
+                    await Scan();
+                }
+                catch (SignInRequiredException) when (MayOpenWithoutSignIn((link, provider)) && !ct.IsCancellationRequested)
+                {
+                    Log.Write("The link needs a Microsoft sign-in after all.");
+                    // The second look finds again whatever the first one found, so this link starts from nothing.
+                    lock (found) found.RemoveRange(foundBefore, found.Count - foundBefore);
+                    roots.IntersectWith(rootsBefore);
+                    Interlocked.Exchange(ref _scanned, foundBefore);
+                    step = "Sign-in did not work";
+                    if (!await EnsureAccessAsync(provider, ct, "This link did not open without an account, so it needs a Microsoft sign-in."))
+                    {
+                        Say(Stage.Error, $"{provider.Name} is not set up yet", "Open Settings to finish the one-time setup, then press Download again.");
+                        return;
+                    }
+                    step = "The link could not be opened";
+                    SayLooking();
+                    await Scan();
+                }
             }
 
             // The same file reached through two links is downloaded once.
@@ -478,11 +511,23 @@ public partial class MainWindow : Window
             // "Not found" from Google Drive without a sign-in is what a private link looks like to an API key.
             bool privateForKey = ex is CloudException { StatusCode: 404 }
                 && ReferenceEquals(opening, _services.GoogleDrive) && !_services.GoogleAuth.IsSignedIn;
-            string hint = ex is not CloudException { StatusCode: 403 or 404 } ? ""
+            // A failure on the guest route says nothing about the signed-in account, whoever is signed in.
+            bool noAccount = ex is CloudException { WithoutAccount: true }
+                || ReferenceEquals(opening, _services.OneDrive) && !_services.MicrosoftAuth.IsSignedIn;
+            // An answer on the guest route that is neither a refusal nor a passing fault: an account may still open the link.
+            bool accountMayHelp = ex is CloudException { WithoutAccount: true, Transient: false, StatusCode: not (403 or 404) }
+                && !_services.MicrosoftAuth.IsSignedIn;
+            string hint = accountMayHelp
+                ? " If you have an account that may open this link, click the Microsoft button, sign in and press Download again."
+                : ex is not CloudException { StatusCode: 403 or 404 } ? ""
                 : privateForKey
                     ? " An API key opens only links that anyone with the link can open. For a private link, click the Google button and sign in first."
-                    : " Check that the link is complete and that the signed-in account is allowed to open it.";
-            Say(Stage.Error, step, Errors.Describe(ex).TrimEnd('.') + "." + hint);
+                    : noAccount
+                        ? " Check that the link is complete and that it still opens in a browser."
+                        : " Check that the link is complete and that the signed-in account is allowed to open it.";
+            // A stored sign-in that could not be renewed is a sign-in problem wherever in the run it shows.
+            string headline = ex is CloudException { AtSignIn: true } ? "Sign-in did not work" : step;
+            Say(Stage.Error, headline, Errors.Describe(ex).TrimEnd('.') + "." + hint);
         }
         finally
         {
@@ -571,7 +616,7 @@ public partial class MainWindow : Window
         bool stopping = _cts?.IsCancellationRequested == true;
         if (!_downloading || _engine is null)
         {
-            if (_busy && _looking && _scanned > 0 && !stopping)
+            if (_busy && _counting && _scanned > 0 && !stopping)
                 DetailText.Text = $"{_scanned:N0} files found so far.";
             return;
         }
@@ -646,11 +691,19 @@ public partial class MainWindow : Window
 
     // ---- status card ---------------------------------------------------------
 
+    /// <summary>The search for files. The timer puts the running count under this headline and under no other.</summary>
+    void SayLooking()
+    {
+        Say(Stage.Looking, "Looking through the shared items", "Finding every file and folder behind the link.");
+        _counting = true;
+    }
+
     /// <summary>Sets the headline, the explanation under it, and everything that signals the stage.</summary>
     void Say(Stage stage, string headline, string detail)
     {
         StatusText.Text = headline;
         DetailText.Text = detail;
+        _counting = false;
         _looking = stage == Stage.Looking;
         _moving = stage is Stage.Looking or Stage.Running;
         // Tell screen readers that the headline changed.
@@ -834,7 +887,8 @@ public partial class MainWindow : Window
 
     // Development aid: "CloudLink.exe --demo" shows the window with sample rows; tools\screenshots.ps1 uses it.
     // Further flags: --done, --empty (with --link to keep the link), --google, --google-private (with
-    // --signed-in or --waiting), --help, --settings, --light, --dark, --software.
+    // --signed-in or --waiting), --help, --settings, --light, --dark, --software, and
+    // --say <stage> <headline> <detail> for any status text (to see how a long one fits).
     void ShowDemo()
     {
         var sample = new RemoteEntry { Id = "x", Name = "x" };
@@ -969,5 +1023,8 @@ public partial class MainWindow : Window
             string? notice = privateLink ? "Google sign-in needs a client ID and secret first. The steps are below." : null;
             new SettingsWindow(shown, notice) { Owner = this }.Show();
         }
+        int say = Array.IndexOf(args, "--say");
+        if (say >= 0 && say + 3 < args.Length && Enum.TryParse<Stage>(args[say + 1], true, out var stage))
+            Say(stage, args[say + 2], args[say + 3]);
     }
 }

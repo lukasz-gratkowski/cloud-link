@@ -12,7 +12,15 @@ public sealed class FakeServer : IDisposable
     readonly ConcurrentDictionary<string, Func<HttpListenerContext, Task>> _routes = new();
 
     public string Base { get; }
+
+    /// <summary>The same server under a second host name, for tests about what may cross from one host to another.</summary>
+    public string Alias { get; }
+    public const string AliasHost = "localhost";
+
     public ConcurrentQueue<string> Requests { get; } = new();
+
+    /// <summary>Every request with the host it was sent to and the cookies it carried.</summary>
+    public ConcurrentQueue<(string Host, string PathAndQuery, string Cookies)> Seen { get; } = new();
 
     public FakeServer()
     {
@@ -21,7 +29,9 @@ public sealed class FakeServer : IDisposable
         int port = ((IPEndPoint)probe.LocalEndpoint).Port;
         probe.Stop();
         Base = $"http://127.0.0.1:{port}";
+        Alias = $"http://{AliasHost}:{port}";
         _listener.Prefixes.Add(Base + "/");
+        _listener.Prefixes.Add(Alias + "/");
         _listener.Start();
         _ = Task.Run(LoopAsync);
     }
@@ -101,6 +111,7 @@ public sealed class FakeServer : IDisposable
             {
                 string key = ctx.Request.Url!.PathAndQuery;
                 Requests.Enqueue($"{key} range={ctx.Request.Headers["Range"]} auth={ctx.Request.Headers["Authorization"]}");
+                Seen.Enqueue((ctx.Request.Url.Host, key, ctx.Request.Headers["Cookie"] ?? ""));
                 try
                 {
                     if (_routes.TryGetValue(key, out var handler) || _routes.TryGetValue(ctx.Request.Url.AbsolutePath, out handler))

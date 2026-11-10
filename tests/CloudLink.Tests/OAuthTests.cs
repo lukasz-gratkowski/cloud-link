@@ -5,6 +5,9 @@ using CloudLink.Core;
 
 namespace CloudLink.Tests;
 
+// AppPaths.Root is one value for the whole process, and every test here points it at a folder of its own
+// that is deleted afterwards. Classes that do so share a collection, so that they do not run side by side.
+[Collection("AppPaths.Root")]
 public sealed class OAuthTests : IDisposable
 {
     readonly FakeServer _server = new();
@@ -139,6 +142,9 @@ public sealed class OAuthTests : IDisposable
         var session = Session();
         var failure = await Assert.ThrowsAsync<CloudException>(() => session.GetAccessTokenAsync(default));
         Assert.True(failure.Transient);
+        // The window reads these two: it is a sign-in problem, and no status that would be taken for the link's.
+        Assert.True(failure.AtSignIn);
+        Assert.Equal(0, failure.StatusCode);
         Assert.True(File.Exists(_tokenFile));
     }
 

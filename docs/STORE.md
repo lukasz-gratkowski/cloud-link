@@ -107,7 +107,7 @@ app. Then check:
 | Check | Expected |
 |---|---|
 | Start menu entry and taskbar icon, dark and light theme | "AMG CloudLink", the cloud mark at full size, without a coloured plate behind it |
-| The version line | "Version 1.3.0, Microsoft Store" |
+| The version line | "Version 1.4.0, Microsoft Store" |
 | Microsoft sign-in, with the default browser closed beforehand | The browser opens, the page says *Signed in*, the account button shows the address |
 | A download, and **Stop** then **Continue** | Files arrive, are marked Done and carry on after Stop |
 | `Get-ChildItem "$env:LOCALAPPDATA\Packages\AMGCloudEngineering.AMGCloudLink_zwcny3vzz9sd6\LocalCache\Local\CloudLink"` | `settings.json` and, after a sign-in, `microsoft.token` (the log appears with the first error or with **Open log**) |
@@ -180,7 +180,7 @@ counts below were taken from those files.
 | Field in Partner Center | File | Length | Limit |
 |---|---|---|---|
 | Short description | `short-description.txt` | 239 characters | 1,000; the first 270 are shown in some places |
-| Description | `description.txt` | about 4,350 characters | 10,000; plain text, no web addresses |
+| Description | `description.txt` | about 4,550 characters | 10,000; plain text, no web addresses |
 | Product features | `features.txt` | 14 lines, the longest 107 characters | 20 features of 200 characters |
 | Keywords (formerly search terms) | `keywords.txt` | 7 terms, 17 words | 7 terms of 40 characters, 21 words; no other products' names (policy 10.1.3) |
 | Copyright and trademark info | `copyright.txt` | 171 characters | 200 |
@@ -205,8 +205,8 @@ If Google sign-in for private links has not been tried by then, change the listi
 - in the description, *Other limits*: remove the line about documents larger than 10 MB;
 - in the system requirements: "Your own Google Cloud API key, for Google Drive links".
 
-If a work or school account has not been tried, remove the paragraph *Work and school accounts* from the
-description.
+If a work or school account has not been tried, cut the paragraph *Work and school accounts* in the
+description down to its first sentence, about links shared with anyone, which has been tried.
 
 ## 8. Pictures
 
@@ -239,7 +239,7 @@ art and poster art slots are for games.
 
 ## 9. Notes for certification
 
-A tester cannot download anything from OneDrive without signing in, and policy 10.3.1 asks for a working test
+A tester cannot download the OneDrive sample, a personal OneDrive link, without signing in, and policy 10.3.1 asks for a working test
 account when a product needs one. [`store/listing/notes-for-certification.txt`](../store/listing/notes-for-certification.txt)
 therefore starts with a test that needs no account at all (Google Drive with a test key) and gives a test
 account for the OneDrive one. Replace every `[...]`; the filled text has to stay under 2,000 characters. The
@@ -292,7 +292,7 @@ account and an Entra application with the Manager role, and it cannot make the f
 | Signed by | a self-signed certificate (Windows says *Unknown publisher*) | the Store |
 | Updates | download the new exe | the Store, by itself |
 | Settings, sign-ins, log | `%LOCALAPPDATA%\CloudLink`, kept until deleted | `%LOCALAPPDATA%\Packages\AMGCloudEngineering.AMGCloudLink_zwcny3vzz9sd6\LocalCache\Local\CloudLink`, removed on uninstall |
-| Version line in the window | `Version 1.3.0 (commit)` | `Version 1.3.0, Microsoft Store`; Help and Settings add the commit |
+| Version line in the window | `Version 1.4.0 (commit)` | `Version 1.4.0, Microsoft Store`; Help and Settings add the commit |
 | Guide button | the guide on GitHub | the guide on amgcloud.io |
 | Saving under `AppData` | allowed | refused: Windows would keep the files where File Explorer does not show them |
 | `--demo` | sample window for documentation pictures | ignored |

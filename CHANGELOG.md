@@ -3,6 +3,34 @@
 All notable changes are recorded here. The format follows [Keep a Changelog](https://keepachangelog.com),
 and versions follow [Semantic Versioning](https://semver.org).
 
+## [1.4.0] - 2026-11-10
+
+### Added
+- A link from an organisation's OneDrive or SharePoint (`...sharepoint.com`) that is shared with anyone with
+  the link now downloads without any account, as it does in a private browser window: a folder with
+  everything in it, or a single file. CloudLink opens the link as a guest and lists and downloads through
+  the OneDrive API on the organisation's own SharePoint address, with resume and checksum checks as before.
+  Only if the link does not open that way does it ask for the Microsoft sign-in, and it says why. A link
+  that has been removed or has expired is reported as such, with no sign-in asked for.
+  `docs/ARCHITECTURE.md` describes how, and why it can stop working if Microsoft changes it.
+
+### Changed
+- Every work or school link is tried without a sign-in first, also when an account is signed in. On that
+  visit CloudLink goes only to SharePoint hosts and keeps the guest cookie in memory. `SECURITY.md` and
+  `docs/PRIVACY.md` say what the visit sends and where.
+
+### Fixed
+- Such links used to fail with *The service reported an error: Permanent Redirect (HTTP 308)*, which is what
+  Microsoft Graph answers when the signed-in account cannot open a work or school link (typically a
+  personal account). That answer is now explained in words, and a redirect in general is no longer called
+  an error report.
+- A stored sign-in that can no longer be renewed is reported under *Sign-in did not work* also when that
+  shows while the link is being looked through, not only at the sign-in check.
+- An error answer whose message is not plain text, as some of SharePoint's are, is read as well.
+- A failed request to the Microsoft Graph, OneDrive or Google Drive API is logged with the identifiers
+  their support asks for (`request-id`, `client-request-id`, `x-ms-ags-diagnostic`, `SPRequestGuid`) and,
+  for a redirect, the host and path it pointed to, without any key or share link.
+
 ## [1.3.0] - 2026-10-16
 
 The first version in the Microsoft Store, where CloudLink is listed as AMG CloudLink.

@@ -14,7 +14,8 @@ src/CloudLink
 │   ├── AppPackage.cs      what differs when installed as a package (the Microsoft Store version)
 │   └── Settings.cs        settings, the data folder, version info, log
 ├── Providers/
-│   ├── OneDriveProvider.cs     Microsoft Graph shares API
+│   ├── OneDriveProvider.cs     Microsoft Graph shares API, and the guest route below
+│   ├── SharePointGuest.cs      the guest visit for work or school links shared with anyone
 │   └── GoogleDriveProvider.cs  Google Drive v3 API
 ├── App.xaml               brand resources and control styles
 ├── Theme.cs               light / dark brand colours, motion preference
@@ -48,6 +49,61 @@ interface ICloudProvider
 `/drives/{driveId}/items/{id}/children`, falling back to `/shares/{token}/items/{id}/children` if the
 drive refuses direct addressing. Content comes from `.../content`, which redirects to a short-lived
 storage address; the access token is not forwarded to it.
+
+**SharePoint links shared with anyone.** A work or school link (`*.sharepoint.com`, or the same under `.cn`
+or `.us`) is first opened the way a private browser window opens it, whether or not an account is signed
+in. CloudLink follows the link with a cookie store of its own and takes each redirect itself, only over
+HTTPS and only to another SharePoint host; an address anywhere else, such as the Microsoft sign-in page
+that a link for certain people leads to, is not requested. SharePoint redirects to its folder page and
+leaves a guest session cookie (`FedAuth`). With that cookie the OneDrive API v2.0 on the same host
+(`https://{host}/_api/v2.0`, the same JSON as Graph) serves the guest:
+`/shares/{token}/driveItem` for the shared item, `.../driveItem/children` for its contents, and
+`/drives/{driveId}/items/{id}/children` below it (`/shares/{token}/items/{id}` is closed to a guest). A
+next page of a listing is followed only on that host. A file's content comes from its
+`@content.downloadUrl`, asked for afresh on every attempt: a pre-authorised address that needs no cookie
+and honours `Range`, so the download engine fetches it like any other, without the guest cookie. A file
+that is itself the shared item is asked for through its drive first and through the share if the drive
+refuses. The guest's requests carry a User-Agent that begins like a Windows browser's
+(`Mozilla/5.0 (Windows NT 10.0; Win64; x64) CloudLink/x.y.z`); SharePoint refuses the API to a guest
+otherwise. The cookie lives in memory only, in a store that belongs to that one link, and is never written
+to disk.
+
+When the guest session runs out the API answers 401 `unauthenticated`, and the visit is made again with an
+empty cookie store, once for all the requests that wait on it. If that new visit does not end where the
+first one did or leaves no guest session, or SharePoint goes on refusing the renewed guest, the visit is
+closed for the rest of the run: the files still to come fail at once, each with the reason, instead of each
+making a visit of its own.
+A file for which SharePoint gives no download address (a link that allows viewing only) fails once, without
+further attempts.
+
+What happens when a link does not open as a guest depends on the answer. If the link leads away from
+SharePoint, if SharePoint refuses the visit, or if the API refuses the guest with 401, 403 or 404 or sends
+it elsewhere, the link goes the Graph way above, and only then does the window ask for the sign-in, saying
+why. A link SharePoint does not know is reported, and nothing asks for a sign-in. SharePoint shows that in
+one of two ways: it answers the link with 404, or, for a link that has been removed or has expired, with a
+page of its own (status 200, no guest cookie) while the API says the sharing link cannot be found (404; a
+link that exists but needs an account gets 401 there). Any other answer, such as a 400 or a page where the item should be, is reported as it stands when
+nobody is signed in; with an account signed in, the link is handed to Graph instead. A passing failure (a
+timeout, 429, 5xx) is tried again a few times and then reported either way. Microsoft does not document
+guest access to this API; it was worked out from what a browser does, and the fallback is what keeps a
+refusal on Microsoft's side from leaving such links unopened. For an answer that is not a refusal, the
+window tells a user who is not signed in that signing in first sends the link the Graph way. Only links from a person's OneDrive
+(`{tenant}-my.sharepoint.com`) have been tried; for a link to a team site the API address on the host's
+root may not be the right one, and the link would then go the Graph way.
+
+When Graph answers a work or school link with a redirect (308, often with no `Location`), the signed-in
+account cannot open it; typically it is a personal account, which an organisation's link rarely admits. By
+then the link has been tried as a guest too, and the message says both. A failed request to the Graph,
+Drive or guest API, other than a 401 or a 429, is logged with whichever of the `request-id`,
+`client-request-id`, `x-ms-ags-diagnostic`, `SPRequestGuid` and `x-msedge-ref` headers it carries and the
+host and path of any `Location`, with a share's encoded link (`u!...`) left out. Of the guest visit itself
+the log has hosts and status codes only, and of a failed download the file's name and the error text.
+
+**A change Microsoft has announced.** According to Message Center post MC1492958 (October 2026), from
+1 April 2027 Microsoft's file APIs stop returning download addresses that carry their own key, and stop
+redirecting to them. Both routes download from such addresses today: Graph's `.../content` redirects to
+one, and the guest route asks for `@content.downloadUrl`. Both have to be tried against the new behaviour
+before that date.
 
 **Google Drive.** The file ID (and resource key, for older links) is parsed from the link. Listing uses
 `files.list` with paging; content uses `files.get?alt=media`. Google-native documents are exported.

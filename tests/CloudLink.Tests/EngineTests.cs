@@ -20,6 +20,9 @@ sealed class FakeProvider(string baseUrl) : ICloudProvider
     public void OnUnauthorized() => Interlocked.Increment(ref UnauthorizedCalls);
 }
 
+// AppPaths.Root is one value for the whole process, and every test here points it at a folder of its own
+// that is deleted afterwards. Classes that do so share a collection, so that they do not run side by side.
+[Collection("AppPaths.Root")]
 public sealed class EngineTests : IDisposable
 {
     readonly FakeServer _server = new();

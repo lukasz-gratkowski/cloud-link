@@ -17,9 +17,11 @@ public partial class HelpWindow : Window
             "Paste it into the box at the top, one link per line. A whole folder is downloaded with all its subfolders, " +
             "into a folder of the same name inside the place you chose under Save to."),
         ("", "Signing in",
-            "The services only hand out files to a signed-in account, so the first download opens your browser to sign in. " +
+            "The services mostly hand out files to a signed-in account, so the first download opens your browser to sign in. " +
             "CloudLink never sees your password, and it stays signed in afterwards. The buttons at the top right show which " +
-            "accounts are connected; click one to sign out. Google Drive needs a one-time setup first, explained in Settings."),
+            "accounts are connected; click one to sign out. Google Drive needs a one-time setup first, explained in Settings. " +
+            "A link from an organisation's OneDrive or SharePoint that is shared with anyone with the link needs no sign-in: " +
+            "CloudLink opens it as a guest, as a private browser window does."),
         ("", "Stopping and continuing",
             "You can press Stop, close the program, lose the connection or restart the PC at any point. Unfinished files are kept " +
             "with a .part ending. Press Download again with the same link and folder and CloudLink carries on from where it stopped, " +

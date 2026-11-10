@@ -72,13 +72,24 @@ The same applies after a lost connection, sleep, a crash or a reboot.
 
 ### OneDrive and SharePoint
 
-Press **Download** with a OneDrive link, or click **Microsoft: sign in**. Your browser opens; sign in with
-the Microsoft account that can open the link. You do not need an Azure account, a tenant or anything else
-from Microsoft beyond that account.
+**Links from an organisation shared with anyone need no account.** If a link from a company's or school's
+OneDrive or SharePoint (`...sharepoint.com`) is shared with *anyone with the link*, just press **Download**.
+CloudLink opens it the way a private browser window does, as a guest, and nothing asks you to sign in. If
+the link does not open that way, for instance because it is shared only with certain people or only with
+people in the organisation, CloudLink says *This link did not open without an account, so it needs a
+Microsoft sign-in* and goes on as below.
+
+For every other OneDrive link, press **Download**, or click **Microsoft: sign in**. Your browser opens; sign
+in with the Microsoft account that can open the link. You do not need an Azure account, a tenant or anything
+else from Microsoft beyond that account.
 
 Use the kind of account that matches the link: a personal Microsoft account for links from a personal
 OneDrive (`1drv.ms`, `onedrive.live.com`), a work or school account for links from an organisation
 (`...sharepoint.com`). A personal-OneDrive link shared with *anyone* can be opened with any personal account.
+An organisation's link that does not open without an account opens only for the accounts that organisation
+allows, and a personal account is usually not one of them; CloudLink then says *Microsoft would not open
+this work or school link for the signed-in account*. Ask the sender for an *Anyone with the link* link, or
+sign in with an account of that organisation.
 
 Microsoft's permission page says the app can *edit* your files. Microsoft Graph only opens share links for
 apps holding a read-write permission, so there is no way around asking for it. CloudLink only downloads: it
@@ -297,6 +308,11 @@ file has small letters. [Verifying and signing](SIGNING.md) explains the signatu
 | *Not found, or the link no longer works* | The link is incomplete, was withdrawn, or the signed-in account may not open it. Open it in a browser with the same account to check. |
 | *Not found* for a Google Drive link while the Google button reads **Google: public links only** | The link is private, and an API key opens only public ones. Click the Google button and sign in; see [route B](#route-b-sign-in-for-private-links). |
 | *Access denied* | Sign in with the account the item was shared with. |
+| *SharePoint answered with a page instead of the shared item*, or another answer from SharePoint that is not a refusal | SharePoint did not serve the link to a visitor without an account in the way CloudLink expects. If you have an account that may open the link, click the Microsoft button, sign in and press **Download** again; the link then goes through the sign-in. |
+| *SharePoint does not know this link* | The link has been removed by the person who shared it, has expired, or was not copied whole. A private browser window shows the same (*This link has been removed*). Ask the sender for a new link. |
+| *Microsoft would not open this work or school link for the signed-in account* | The link did not open without an account, and the account you are signed in with is not one its organisation allows. Open the link in a private browser window: if it asks you to sign in there too, ask the sender for an *Anyone with the link* link, or sign in with an account of that organisation. |
+| *The link no longer opens without an account*, or *SharePoint stopped letting CloudLink in as a guest*, part of the way through | The link was switched off, limited to certain people, or ran out while CloudLink was downloading. The files already marked Done are complete. Ask the sender for a new link. |
+| *SharePoint did not give a download address for this file* | The link probably lets people look at the files without downloading them (*Block download*). Ask the sender for a link that allows downloads. |
 | *Access denied* for a Google Drive link when you use an API key | CloudLink puts *Access denied* in front of several different answers from Google, so read the rest of the line first. If it says the file is too large to be exported, see the row about Google documents below. If it mentions a rate limit and ends in *Trying again in n s*, CloudLink is retrying by itself and there is nothing to do. Otherwise the key is probably not allowed to call the Drive API: check that its API restriction is **Google Drive API**, that **Application restrictions** is **None**, and that the Drive API is switched on in the project; then allow five minutes. See [route A](#route-a-an-api-key-for-links-anyone-can-open). |
 | *API key not valid* | The key was mistyped, or deleted in the console. Copy it again into Settings. |
 | *Your organisation requires an administrator to approve CloudLink* / **Need admin approval** in the browser | Your work or school does not let you approve apps yourself. Close the page, press **Stop** in CloudLink if it is still waiting, and see [Work and school accounts](APP-REGISTRATION.md#work-and-school-accounts). |

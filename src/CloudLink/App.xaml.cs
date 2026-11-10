@@ -121,7 +121,7 @@ public sealed class Services
         MicrosoftAuth.ForgetIfForeign();
         GoogleAuth.ForgetIfForeign();
 
-        OneDrive = new OneDriveProvider(api, MicrosoftAuth);
+        OneDrive = new OneDriveProvider(api, MicrosoftAuth) { GuestUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " + agent };
         GoogleDrive = new GoogleDriveProvider(api, GoogleAuth, () => Settings.GoogleApiKey);
         Providers = [OneDrive, GoogleDrive];
     }

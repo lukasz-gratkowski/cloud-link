@@ -1,6 +1,7 @@
 using System.IO;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace CloudLink.Core;
 
@@ -9,6 +10,12 @@ public class CloudException(string message, bool transient, TimeSpan? retryAfter
     public bool Transient { get; } = transient;
     public TimeSpan? RetryAfter { get; } = retryAfter;
     public int StatusCode { get; init; }
+
+    /// <summary>The request was made as a guest, so no signed-in account had a part in the answer.</summary>
+    public bool WithoutAccount { get; init; }
+
+    /// <summary>The failure is about the sign-in itself (getting or renewing a token), not about a link or a file.</summary>
+    public bool AtSignIn { get; init; }
 }
 
 public sealed class SignInRequiredException(string service)
@@ -40,9 +47,30 @@ public static class Errors
             403 => "Access denied",
             404 => "Not found, or the link no longer works",
             429 => "The service asked to slow down",
+            >= 300 and < 400 => "The service sent the request elsewhere instead of answering",
             _ => "The service reported an error",
         };
         return new CloudException($"{lead}: {detail} (HTTP {code})", transient, retryAfter) { StatusCode = code };
+    }
+
+    /// <summary>
+    /// One log line with what Microsoft's and Google's support ask for when a request goes wrong.
+    /// Addresses are cut to host and path, and a share's encoded link is left out: a query can carry a
+    /// short-lived key, and a link shared with anyone is a key in itself.
+    /// </summary>
+    public static string Diagnostics(HttpResponseMessage resp)
+    {
+        static string? Header(HttpResponseMessage r, string name) =>
+            r.Headers.TryGetValues(name, out var v) ? string.Join(",", v) : null;
+        var parts = new List<string> { $"HTTP {(int)resp.StatusCode} from {resp.RequestMessage?.RequestUri?.Host}" };
+        if (resp.Headers.Location is { } loc)
+        {
+            string where = loc.IsAbsoluteUri ? loc.Host + loc.AbsolutePath : loc.OriginalString.Split('?', '#')[0];
+            parts.Add("location " + Regex.Replace(where, "u(?:!|%21)[A-Za-z0-9_-]+", "u!..."));
+        }
+        foreach (string name in new[] { "request-id", "client-request-id", "x-ms-ags-diagnostic", "SPRequestGuid", "x-msedge-ref" })
+            if (Header(resp, name) is { } value) parts.Add($"{name} {value}");
+        return string.Join("; ", parts);
     }
 
     static string? ExtractMessage(string body)
@@ -55,10 +83,14 @@ public static class Errors
             if (root.ValueKind != JsonValueKind.Object) return null;
             if (root.TryGetProperty("error_description", out var d) && d.ValueKind == JsonValueKind.String)
                 return FirstLine(d.GetString());
-            if (!root.TryGetProperty("error", out var err)) return null;
+            if (!root.TryGetProperty("error", out var err) && !root.TryGetProperty("odata.error", out err)) return null;
             if (err.ValueKind == JsonValueKind.String) return err.GetString();
             if (err.ValueKind == JsonValueKind.Object && err.TryGetProperty("message", out var m))
-                return FirstLine(m.GetString());
+            {
+                // SharePoint's older answers carry the text one level down: {"lang":"en-US","value":"..."}.
+                if (m.ValueKind == JsonValueKind.Object && m.TryGetProperty("value", out var value)) m = value;
+                if (m.ValueKind == JsonValueKind.String) return FirstLine(m.GetString());
+            }
         }
         catch (JsonException) { }
         return null;
@@ -131,6 +163,7 @@ public static class Api
                 string body = await resp.Content.ReadAsStringAsync(cts.Token);
                 if (resp.IsSuccessStatusCode) return JsonDocument.Parse(body);
                 if ((int)resp.StatusCode == 401) onUnauthorized();
+                else if ((int)resp.StatusCode != 429) Log.Write(Errors.Diagnostics(resp));
                 throw Errors.FromResponse(resp, body);
             }
             catch (Exception ex) when (!ct.IsCancellationRequested && attempt < 6 && Errors.IsTransient(ex))

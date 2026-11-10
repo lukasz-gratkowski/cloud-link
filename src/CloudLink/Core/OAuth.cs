@@ -183,7 +183,7 @@ public sealed class OAuthSession(Func<OAuthConfig> config, string tokenFileName,
                 SignOut();
                 throw new SignInRequiredException(cfg.Service);
             }
-            throw new CloudException(failure.Message, status is 408 or 429 or >= 500, failure.RetryAfter);
+            throw new CloudException(failure.Message, status is 408 or 429 or >= 500, failure.RetryAfter) { AtSignIn = true };
         }
 
         using var doc = JsonDocument.Parse(body);

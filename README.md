@@ -63,7 +63,14 @@ published at <https://amgcloud.io/apps/cloudlink/guide/>.
 
 CloudLink uses the services' official APIs: the Microsoft Graph *shares* API and the Google Drive v3 API.
 It signs in through your browser with OAuth (authorization code with PKCE), so it never sees a password.
-There are no scraped web pages or undocumented endpoints to break when a site changes.
+It reads no web pages for file lists or download addresses.
+
+The one exception to the sign-in is a work or school link (`...sharepoint.com`) shared with *anyone with the
+link*. CloudLink opens such a link the way a private browser window does, as a guest with no account, and
+then uses the OneDrive API on the organisation's own SharePoint address with that guest visit. Every work
+or school link is tried this way first, and one that does not open as a guest goes through the sign-in.
+Microsoft does not document this way in, so a change on its side could close it; a link that SharePoint
+then refuses to a guest goes through the sign-in like any other.
 
 Each file is written as `name.part`, continued with HTTP range requests after any interruption, verified,
 and only then renamed. A fresh download address is requested on every attempt, so nothing expires mid-run.
@@ -119,9 +126,15 @@ made-up identity. See [docs/STORE.md](docs/STORE.md).
 - Google Drive requires credentials that you create yourself; Google does not allow access without them.
 - Work and school Microsoft accounts usually need an administrator to approve CloudLink once for the
   organisation; that is Microsoft's default for apps from a publisher it has not verified
-  ([details](docs/APP-REGISTRATION.md#work-and-school-accounts)). Personal accounts do not.
-- What has been tested: OneDrive sign-in and download with a personal Microsoft account, and Google Drive
-  links that anyone can open, with an API key. Not tested: work and school Microsoft accounts; opening a link
-  with the other kind of Microsoft account (a personal account on a `sharepoint.com` link or the reverse);
-  and Google sign-in for private links, which so far is covered only by automated tests against a local
-  stand-in server.
+  ([details](docs/APP-REGISTRATION.md#work-and-school-accounts)). Personal accounts do not. A work or school
+  link shared with anyone with the link needs no account at all.
+- A work or school link that does not open without an account opens, through the sign-in, only for accounts
+  its organisation allows, which a personal Microsoft account usually is not. Microsoft Graph then answers
+  with a redirect instead of the files, and CloudLink explains what that means.
+- What has been tested: OneDrive sign-in and download with a personal Microsoft account; a work or school
+  folder link shared with anyone, from a person's OneDrive, downloaded without an account (a single-file
+  link of the same kind worked with an earlier build of this version and is covered by automated tests
+  since); and Google Drive links that anyone can open, with an API key. Not tested: work and school
+  Microsoft accounts; a link to a SharePoint team site; a personal account on a personal link
+  shared only with certain people; and Google sign-in for private links, which so far is covered only by
+  automated tests against a local stand-in server.

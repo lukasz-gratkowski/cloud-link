@@ -1,6 +1,6 @@
 # CloudLink privacy statement
 
-*Last updated: 16 October 2026*
+*Last updated: 9 November 2026*
 
 CloudLink is a program that runs on your own computer. AMG Cloud Engineering, its publisher, operates no
 service for it, and **CloudLink sends the publisher nothing**: no account details, no file names, no usage
@@ -18,7 +18,7 @@ Only the services you ask it to download from, and only from your computer:
 
 | Service | What is exchanged |
 |---|---|
-| Microsoft (sign-in, Microsoft Graph, OneDrive and SharePoint storage) | Your sign-in, made in your browser on Microsoft's own pages; the share links you paste; requests to list and download the files behind them. |
+| Microsoft (sign-in, Microsoft Graph, OneDrive and SharePoint storage) | Your sign-in, made in your browser on Microsoft's own pages; the share links you paste; requests to list and download the files behind them. A work or school link (`...sharepoint.com`) is first opened without a sign-in, whether or not you are signed in: a guest visit to the organisation's SharePoint like the one a private browser window makes, which SharePoint sees as an anonymous use of the link from your internet address. If the link opens that way, its files are listed and downloaded without your account. The guest cookie SharePoint gives is kept in memory only and forgotten when CloudLink closes. |
 | Google (sign-in, Google Drive API) | The same, for Google Drive links; if you use an API key instead of signing in, that key. |
 
 Those exchanges are covered by Microsoft's and Google's own privacy statements. CloudLink contains no

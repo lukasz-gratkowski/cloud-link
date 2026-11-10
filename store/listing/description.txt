@@ -1,4 +1,4 @@
-Needs an internet connection and a web browser. OneDrive links need a Microsoft account. Google Drive™ links need credentials that you create yourself, once, in the Google Cloud console. Details are under "Before you start" below.
+Needs an internet connection and a web browser. OneDrive links need a Microsoft account, except links from an organisation that are shared with anyone with the link. Google Drive™ links need credentials that you create yourself, once, in the Google Cloud console. Details are under "Before you start" below.
 
 AMG CloudLink downloads shared folders and files from OneDrive and Google Drive to your Windows PC.
 
@@ -22,7 +22,7 @@ Google documents. Google Docs, Sheets and Slides are exported as .docx, .xlsx an
 BEFORE YOU START
 OneDrive. The first download opens your browser for a Microsoft sign-in. With a personal Microsoft account there is nothing else to set up. Microsoft's permission page says that the app can edit your files. Microsoft only opens share links for apps that hold a read and write permission, so CloudLink has to ask for it. CloudLink only downloads: it never uploads, changes or deletes files. Opening a link records your account as having opened it, as opening it in a browser does. The same page calls the app "unverified". That refers to a Microsoft programme for publishers, not to the program itself.
 
-Work and school accounts. Links from an organisation's OneDrive or SharePoint need a work or school account. Most organisations do not let their people approve an app like this themselves, so an administrator may have to approve CloudLink once for the organisation. If Microsoft's page says "Need admin approval", that is the reason.
+Work and school accounts. A link from an organisation's OneDrive or SharePoint that is shared with anyone with the link opens without any account, as it does in a private browser window. Other links from an organisation need a work or school account. Most organisations do not let their people approve an app like this themselves, so an administrator may have to approve CloudLink once for the organisation. If Microsoft's page says "Need admin approval", that is the reason.
 
 Google Drive. CloudLink has no Google registration of its own, so you create access for it yourself in the Google Cloud console: an API key for links that anyone can open, or an OAuth client for private links. You do this once. It takes ten to fifteen minutes and is free of charge today. The user guide on the product website walks through both routes step by step, with pictures.
 
