@@ -180,7 +180,7 @@ counts below were taken from those files.
 | Field in Partner Center | File | Length | Limit |
 |---|---|---|---|
 | Short description | `short-description.txt` | 239 characters | 1,000; the first 270 are shown in some places |
-| Description | `description.txt` | about 4,550 characters | 10,000; plain text, no web addresses |
+| Description | `description.txt` | about 4,480 characters | 10,000; plain text, no web addresses |
 | Product features | `features.txt` | 14 lines, the longest 107 characters | 20 features of 200 characters |
 | Keywords (formerly search terms) | `keywords.txt` | 7 terms, 17 words | 7 terms of 40 characters, 21 words; no other products' names (policy 10.1.3) |
 | Copyright and trademark info | `copyright.txt` | 171 characters | 200 |
@@ -200,13 +200,13 @@ Some lines describe paths that have not been run against the real services yet. 
 If Google sign-in for private links has not been tried by then, change the listing to what has been:
 
 - in the description, *Google Drive*: "an API key for links that anyone can open, or an OAuth client for
-  private links" becomes "an API key, which opens links that anyone can open", and "walks through both routes"
-  becomes "walks through it";
-- in the description, *Other limits*: remove the line about documents larger than 10 MB;
+  private links" becomes "an API key, which opens links that anyone can open", and "describes both options
+  step by step" becomes "describes it step by step";
+- in the description, *Requirements and limitations*: remove the line about documents larger than 10 MB;
 - in the system requirements: "Your own Google Cloud API key, for Google Drive links".
 
-If a work or school account has not been tried, cut the paragraph *Work and school accounts* in the
-description down to its first sentence, about links shared with anyone, which has been tried.
+If a work or school account has not been tried, remove the paragraph *Work and school accounts* from the
+description; links shared with anyone, which have been tried, are covered under *OneDrive and SharePoint*.
 
 ## 8. Pictures
 
